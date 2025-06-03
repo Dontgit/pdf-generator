@@ -7,7 +7,7 @@ const generateController = require('../controllers/generateController');
 const generateMenus = [
   { key: 'SuratHargaPenawaran', label: 'Generate Surat Harga Penawaran (s)' },
   { key: 'BelanjaBarangJasaBOP', label: 'Generate Belanja Barang dan Jasa BOP(s)' },
-  { key: 'SURATPENAWARANHARGA', label: 'Generate SURAT PENAWARAN HARGA(p)' },
+  { key: 'sph', label: 'Generate SURAT PENAWARAN HARGA(p)' },
   { key: 'NegoisasiHargaPenawaran', label: 'Generate Negoisasi Harga Penawaran (s)' },
   { key: 'DaftarHadir', label: 'Generate Daftar Hadir' },
   { key: 'PersetujuanHasilNegosiasi', label: 'Generate Persetujuan Hasil Negosiasi' },
@@ -71,6 +71,7 @@ router.get('/:generateKey', async (req, res) => {
 });
 
 router.post('/pdf/shp', generateController.generateSHP);
+router.post('/pdf/sph', generateController.generateSPH);
 router.post('/pdf/bop', generateController.generateBOPSurat);
 
 

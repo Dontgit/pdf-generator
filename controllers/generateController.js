@@ -8,7 +8,9 @@ const bulan = [
   'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
 ];
 
-const PT = "PT. Mastah Digital Teknologi"
+const PT = "PT. Mastah Digital Teknologi";
+const JabatanPT = "Direktur";
+const Direktur = "Rochim Ramadhani Chiefto Irawan, S. Kom";
 const sekarang = new Date();
 
 const tanggal = sekarang.getDate().toString().padStart(2, '0'); // 2 digit, misal "03"
@@ -412,7 +414,7 @@ exports.generateBOPSurat = async (req, res) => {
       kegiatan: invoice.Kegiatan,
       barang: item.Nama_Barang || '',
       spesifikasi: '',
-      volume: item.Volume || '',
+      volume: item.Volume.toString() || '',
       satuan: item.Satuan || '',
     }));
 
@@ -601,6 +603,162 @@ exports.generateSHP = async (req, res) => {
   console.log('Response dikirim');
 
   } catch (err) {
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+// Generate SPH (Surat Penawaran Harga) - Price Quote Letter FROM PT. Mastah TO Customer
+exports.generateSPH = async (req, res) => {
+  const {
+    nomor,tempat, perihal, invoiceId
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead (assuming we have a default one or create simple header)
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // PT. Mastah Header
+    let startY = 800;
+     // Starting points for letter content
+     const startX = 50;
+     
+     function drawLabelColonValue(label, value, y,x) {
+      const labelX = x;
+      const colonX = labelX+ 40;
+      const valueX = colonX + 10;
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: valueX, y, size: fontSize, font: fontRegular });
+    }
+    
+    const templatePath = path.join(__dirname, '..', 'public', 'template_kop_surat.png');
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Line separator
+    startY -=  height;
+    const center = 595 / 2 - 100;
+    page.drawText('SURAT PENAWARAN HARGA', { x: center, y: startY, size: fontSize + 4, font: fontBold });
+    startY -=  10;
+
+    page.drawLine({
+      start: { x: center , y: startY },
+      end: { x: center + 210, y: startY },
+      thickness: 2,
+      color: rgb(0, 0, 0),
+    });
+
+    startY -= 12;
+
+    drawLabelColonValue('Nomor', nomor || '', startY,center+30);
+    
+    // Letter details
+    startY -= 20;
+    
+   
+
+    // Recipient
+    page.drawText('Kepada Yth.', { x: startX, y: startY, size: fontSize, font: fontRegular });
+    // startY -= 15;
+    // page.drawText(costumer.Jabatan, { x: startX, y: startY, size: fontSize, font: fontRegular });
+    startY -= 15;
+    page.drawText(costumer.Sekolah, { x: startX, y: startY, size: fontSize, font: fontRegular });
+    startY -= 15;
+    page.drawText(costumer.Alamat, { x: startX, y: startY, size: fontSize, font: fontRegular });
+    startY -= 30;
+    drawLabelColonValue('Perihal', perihal || '', startY, startX);
+    startY -= 30;
+
+    // Letter content
+    let yPosition = startY- 20;
+    page.drawText('Dengan hormat,', { x: startX, y: startY, size: fontSize, font: fontRegular });
+    const isi_surat = `Kami dari ${PT} bermaksud menanggapi Surat Permintaan Penawaran harga untuk ${invoice.Kegiatan} pada ${costumer.Sekolah}. Berikut kami sampaikan penawaran harga terbaik kami sebesar Rp ${formatRupiah(invoice.Total_Harga)} dengan rincian sebagai berikut :`;
+    
+    const paragraphs = isi_surat.split('\n\n');
+    paragraphs.forEach(paragraph => {
+      yPosition = drawParagraphJustify(page, paragraph.trim(), 50, yPosition, 495, 18, fontRegular, fontSize);
+      yPosition -= 18;
+    });
+
+    // Table
+    startY = yPosition + 8;
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Volume', key: 'volume', width: 60 },
+      { header: 'Satuan', key: 'satuan', width: 60 },
+      { header: 'Harga Satuan', key: 'harga', width: 80 },
+      { header: 'Jumlah', key: 'jumlah', width: 60 },
+    ];
+
+    const rows = detail_invoice.map((item, idx) => ({
+      no: (idx + 1).toString(),
+      namabarang: item.Nama_Barang || '',
+      volume: item.Volume ? item.Volume.toString() : '',
+      satuan: item.Satuan ? item.Satuan.toString() : '',
+      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
+      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+    }));
+
+    const summaryRows = [
+      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+    ];
+
+    startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
+
+    // Closing paragraph
+    const penutup = `Demikian surat penawaran harga ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan terima kasih.`;
+    
+    yPosition = startY - 30;
+    const penutupParagraphs = penutup.split('\n\n');
+    penutupParagraphs.forEach(paragraph => {
+      yPosition = drawParagraphJustify(page, paragraph.trim(), 50, yPosition, 495, 18, fontRegular, fontSize);
+      yPosition -= 18;
+    });
+
+    // Signature
+    page.drawText(`${tempat}, ${tanggalFormatted}`, { x: startX, y: yPosition - 20, size: fontSize, font: fontRegular });
+    page.drawText(`${PT}`, { x: startX, y: yPosition - 40, size: fontSize, font: fontBold });
+    page.drawText(`${JabatanPT}`, { x: startX, y: yPosition - 100, size: fontSize, font: fontBold });
+    page.drawText(`${Direktur}`, { x: startX, y: yPosition - 120, size: fontSize, font: fontBold });
+
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="SPH.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate SPH PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
   }
 };
