@@ -1,0 +1,121 @@
+<%- include('../../partials/header') %>
+
+<div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 mt-10">
+  <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Generate Undangan Negosiasi Harga</h2>
+
+  <form action="/generate/pdf/undangan-negosiasi" method="POST" class="space-y-5">
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <div>
+      <label for="nomor" class="block font-medium text-gray-700 mb-1">Nomor Surat</label>
+      <input
+        type="text"
+        id="nomor"
+        name="nomor"
+        required
+        placeholder="Contoh: 015/UNDN/2025"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="lampiran" class="block font-medium text-gray-700 mb-1">Lampiran</label>
+      <input
+        type="text"
+        id="lampiran"
+        name="lampiran"
+        placeholder="Contoh: 1 berkas"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="daerah" class="block font-medium text-gray-700 mb-1">Daerah Surat Dibuat</label>
+      <input
+        type="text"
+        id="daerah"
+        name="daerah"
+        placeholder="Contoh: Jakarta"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label for="hariTanggal" class="block font-medium text-gray-700 mb-1">Hari/Tanggal</label>
+      <input
+        type="text"
+        id="hariTanggal"
+        name="hariTanggal"
+        placeholder="Contoh: Rabu, 11 Desember 2024"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="waktu" class="block font-medium text-gray-700 mb-1">Waktu</label>
+      <input
+        type="text"
+        id="waktu"
+        name="waktu"
+        placeholder="Contoh: 08.00 WIB - Selesai"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+
+    <div>
+      <label for="tempat" class="block font-medium text-gray-700 mb-1">Tempat</label>
+      <input
+        type="text"
+        id="tempat"
+        name="tempat"
+        placeholder="Contoh: Ruang Sidang SMK 69"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="alamat" class="block font-medium text-gray-700 mb-1">Alamat</label>
+      <textarea
+        id="alamat"
+        name="alamat"
+        rows="2"
+        placeholder="Contoh: Jl. Pendidikan No. 12, Jakarta"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      ></textarea>
+    </div>
+
+    <div>
+      <label for="acara" class="block font-medium text-gray-700 mb-1">Acara</label>
+      <input
+        type="text"
+        id="acara"
+        name="acara"
+        placeholder="Contoh: Negosiasi Harga Penawaran"
+        required
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div class="flex justify-between items-center">
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+      >
+        <i class="fa fa-file-pdf-o mr-2"></i> Generate PDF
+      </button>
+      <a
+        href="/generate"
+        class="bg-gray-100 text-gray-700 px-6 py-2 rounded hover:bg-gray-200 transition"
+      >
+        <i class="fa fa-arrow-left mr-2"></i> Kembali
+      </a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

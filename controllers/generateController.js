@@ -11,6 +11,7 @@ const bulan = [
 const PT = "PT. Mastah Digital Teknologi";
 const JabatanPT = "Direktur";
 const Direktur = "Rochim Ramadhani Chiefto Irawan, S. Kom";
+const AlamatKantor = "Tampat Durian No. 13 RT 003 RW 004 \n\nKel. Korong Gadang, Kec.kuranji, \n\nKota Padang 25156"
 const sekarang = new Date();
 
 const tanggal = sekarang.getDate().toString().padStart(2, '0'); // 2 digit, misal "03"
@@ -39,7 +40,6 @@ function wrapText(text, maxWidth, font, fontSize) {
   lines.push(currentLine);
   return lines;
 }
-
 
 // Fungsi gambar tabel dengan summary
 function drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, font, fontBold, fontSize) {
@@ -86,32 +86,31 @@ function drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, 
   });
 
   // Summary rows
-// Summary rows (colspan label di kolom ke-2 sampai ke-5)
-if (summaryRows && summaryRows.length > 0) {
-  summaryRows.forEach((sumRow, idx) => {
-    const y = startY - rowHeight * (rows.length + 2 + idx) + 5;
-    const label = sumRow.label;
-    const value = sumRow.value.toString();
-    const labelFontSize = fontSize;
-    const valueFontSize = fontSize;
+  if (summaryRows && summaryRows.length > 0) {
+    summaryRows.forEach((sumRow, idx) => {
+      const y = startY - rowHeight * (rows.length + 2 + idx) + 5;
+      const label = sumRow.label;
+      const value = sumRow.value.toString();
+      const labelFontSize = fontSize;
+      const valueFontSize = fontSize;
 
-    // Gabung kolom Nama Barang, Volume, Satuan, Harga Satuan (kolom index 1 sampai 4)
-    const labelCols = columns.slice(1, 5);
-    const labelAreaWidth = labelCols.reduce((a,b) => a + b.width, 0);
-    const labelStartX = startX + columns[0].width; // start setelah kolom No
+      // Gabung kolom Nama Barang, Volume, Satuan, Harga Satuan (kolom index 1 sampai 4)
+      const labelCols = columns.slice(1, 5);
+      const labelAreaWidth = labelCols.reduce((a,b) => a + b.width, 0);
+      const labelStartX = startX + columns[0].width; // start setelah kolom No
 
-    // Hitung posisi label supaya rata kanan di area gabungan
-    const labelWidth = font.widthOfTextAtSize(label, labelFontSize);
-    const labelX = labelStartX + labelAreaWidth - labelWidth - 5;
-    page.drawText(label, { x: labelX, y, size: labelFontSize, font: fontBold });
+      // Hitung posisi label supaya rata kanan di area gabungan
+      const labelWidth = font.widthOfTextAtSize(label, labelFontSize);
+      const labelX = labelStartX + labelAreaWidth - labelWidth - 5;
+      page.drawText(label, { x: labelX, y, size: labelFontSize, font: fontBold });
 
-    // Value di kolom jumlah paling kanan
-    const lastColStartX = startX + colWidths.slice(0, columns.length).reduce((a,b) => a + b, 0) - columns[columns.length -1].width;
-    const valueWidth = font.widthOfTextAtSize(value, valueFontSize);
-    const valueX = lastColStartX + columns[columns.length -1].width - valueWidth - 5;
-    page.drawText(value, { x: valueX, y, size: valueFontSize, font: fontBold });
-  });
-}
+      // Value di kolom jumlah paling kanan
+      const lastColStartX = startX + colWidths.slice(0, columns.length).reduce((a,b) => a + b, 0) - columns[columns.length -1].width;
+      const valueWidth = font.widthOfTextAtSize(value, valueFontSize);
+      const valueX = lastColStartX + columns[columns.length -1].width - valueWidth - 5;
+      page.drawText(value, { x: valueX, y, size: valueFontSize, font: fontBold });
+    });
+  }
 
   // Garis vertikal
   let lineX = startX;
@@ -138,6 +137,7 @@ if (summaryRows && summaryRows.length > 0) {
 
   return startY - tableHeight - 10;
 }
+
 // Fungsi untuk gambar satu baris dengan justify (rata kanan kiri)
 function drawJustifiedLine(page, text, x, y, maxWidth, font, fontSize) {
   const words = text.split(' ');
@@ -162,16 +162,13 @@ function drawJustifiedLine(page, text, x, y, maxWidth, font, fontSize) {
   });
 }
 
-
-
 // Fungsi draw paragraph dengan justify dan indentasi paragraf
 function drawParagraphJustify(page, text, x, y, maxWidth, lineHeight, font, fontSize, indentPx = 0) {
-
   const indent = '    '; // 4 spasi misalnya
-    const words = text.split(' ');
+  const words = text.split(' ');
 
-// Masukkan spasi indentasi sebagai elemen pertama
-    words.unshift(indent);
+  // Masukkan spasi indentasi sebagai elemen pertama
+  words.unshift(indent);
 
   let line = '';
   let currentY = y;
@@ -199,13 +196,11 @@ function drawParagraphJustify(page, text, x, y, maxWidth, lineHeight, font, font
   return currentY;
 }
 
- // Fungsi gambar tabel manual
-  function drawTable(page, startX, startY, columns, rows, font, fontSize) {
-    
+// Fungsi gambar tabel manual
+function drawTable(page, startX, startY, columns, rows, font, fontSize) {
   const rowHeight = 20;
   const colWidths = columns.map(col => col.width);
   const tableWidth = colWidths.reduce((a,b) => a + b, 0);
-  
 
   // Header background
   page.drawRectangle({
@@ -223,38 +218,39 @@ function drawParagraphJustify(page, text, x, y, maxWidth, lineHeight, font, font
     const centerX = colStartX + (col.width / 2) - (textWidth / 2);
     page.drawText(col.header, { x: centerX, y: startY - rowHeight + 5, size: fontSize, font, color: rgb(0, 0, 0) });
   });
-let rowHeights = []; // untuk simpan tinggi tiap baris
-let currentY = startY - rowHeight * 2 ; // posisi awal setelah header
 
-rows.forEach((row, rowIndex) => {
-  const cellLinesPerRow = [];
+  let rowHeights = []; // untuk simpan tinggi tiap baris
+  let currentY = startY - rowHeight * 2 ; // posisi awal setelah header
 
-  columns.forEach((col, colIndex) => {
-    const cellText = row[col.key] ? row[col.key].toString() : '';
-    const lines = wrapText(cellText, col.width - 10, font, fontSize);
-    cellLinesPerRow.push(lines);
-  });
+  rows.forEach((row, rowIndex) => {
+    const cellLinesPerRow = [];
 
-  const maxLines = Math.max(...cellLinesPerRow.map(lines => lines.length));
-  const rowHeightAdjusted = maxLines * (fontSize + 4); // tinggi baris disesuaikan
-  rowHeights.push(rowHeightAdjusted); // simpan tinggi baris
-
-  columns.forEach((col, colIndex) => {
-    const cellTextLines = cellLinesPerRow[colIndex];
-    const colStartX = startX + colWidths.slice(0, colIndex).reduce((a, b) => a + b, 0);
-
-    cellTextLines.forEach((line, lineIdx) => {
-      const textWidth = font.widthOfTextAtSize(line, fontSize);
-      const centerX = colStartX + (col.width / 2) - (textWidth / 2);
-      const textY = currentY - (fontSize + 4) * lineIdx + 5;
-      page.drawText(line, { x: centerX, y: textY, size: fontSize, font });
+    columns.forEach((col, colIndex) => {
+      const cellText = row[col.key] ? row[col.key].toString() : '';
+      const lines = wrapText(cellText, col.width - 10, font, fontSize);
+      cellLinesPerRow.push(lines);
     });
+
+    const maxLines = Math.max(...cellLinesPerRow.map(lines => lines.length));
+    const rowHeightAdjusted = maxLines * (fontSize + 4); // tinggi baris disesuaikan
+    rowHeights.push(rowHeightAdjusted); // simpan tinggi baris
+
+    columns.forEach((col, colIndex) => {
+      const cellTextLines = cellLinesPerRow[colIndex];
+      const colStartX = startX + colWidths.slice(0, colIndex).reduce((a, b) => a + b, 0);
+
+      cellTextLines.forEach((line, lineIdx) => {
+        const textWidth = font.widthOfTextAtSize(line, fontSize);
+        const centerX = colStartX + (col.width / 2) - (textWidth / 2);
+        const textY = currentY - (fontSize + 4) * lineIdx + 5;
+        page.drawText(line, { x: centerX, y: textY, size: fontSize, font });
+      });
+    });
+
+    currentY -= rowHeightAdjusted;
   });
 
-  currentY -= rowHeightAdjusted;
-});
-
-const tableHeight = rowHeight + rowHeights.reduce((a, b) => a + b, 0); // ✅ Ini yang benar
+  const tableHeight = rowHeight + rowHeights.reduce((a, b) => a + b, 0);
 
   // Vertical lines
   let lineX = startX;
@@ -267,31 +263,33 @@ const tableHeight = rowHeight + rowHeights.reduce((a, b) => a + b, 0); // ✅ In
     });
     if (i < columns.length) lineX += columns[i].width;
   }
-  let yPointer = startY; // mulai dari bawah header
-    page.drawLine({ // garis setelah header
-      start: { x: startX, y: yPointer },
-      end: { x: startX + tableWidth, y: yPointer },
-      thickness: 1,
-      color: rgb(0, 0, 0),
-    });
-    yPointer = startY - rowHeight; // mulai dari bawah header
-    page.drawLine({ // garis setelah header
-      start: { x: startX, y: yPointer },
-      end: { x: startX + tableWidth, y: yPointer },
-      thickness: 1,
-      color: rgb(0, 0, 0),
-    });
-    yPointer -= 5;
-for (let i = 0; i < rowHeights.length; i++) {
-  yPointer -= rowHeights[i] ;
+
+  let yPointer = startY;
   page.drawLine({
     start: { x: startX, y: yPointer },
     end: { x: startX + tableWidth, y: yPointer },
     thickness: 1,
     color: rgb(0, 0, 0),
   });
-}
 
+  yPointer = startY - rowHeight;
+  page.drawLine({
+    start: { x: startX, y: yPointer },
+    end: { x: startX + tableWidth, y: yPointer },
+    thickness: 1,
+    color: rgb(0, 0, 0),
+  });
+
+  yPointer -= 5;
+  for (let i = 0; i < rowHeights.length; i++) {
+    yPointer -= rowHeights[i];
+    page.drawLine({
+      start: { x: startX, y: yPointer },
+      end: { x: startX + tableWidth, y: yPointer },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+  }
 
   return startY - tableHeight - 10;
 }
@@ -312,7 +310,7 @@ exports.generateBOPSurat = async (req, res) => {
     const pdfDoc = await PDFDocument.create();
     const page = pdfDoc.addPage([595, 842]); // A4
 
-     const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
     if (!fs.existsSync(templatePath)) {
       return res.status(404).send("Template image not found.");
     }
@@ -327,7 +325,8 @@ exports.generateBOPSurat = async (req, res) => {
     const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
     const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
     const fontSize = 10;
-  // Starting points
+
+    // Starting points
     const labelX = 50;
     const colonX = 150;
     const valueX = 160;
@@ -356,37 +355,34 @@ exports.generateBOPSurat = async (req, res) => {
     page.drawText('Kepada Yth.', { x: startX, y: startY, size: fontSize, font: fontBold });
     startY -= 15;
     page.drawText('PT. Mastah Digital Teknologi', { x: startX , y: startY, size: fontSize, font: fontBold });
-      startY -= 15;
+    startY -= 15;
     page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontBold });
-      // Paragraf Pembuka
+
+    // Paragraf Pembuka
     startY -= 50;
     page.drawText(tanggalFormatted, { x: 425, y: 842 - height - 40, size: fontSize, font: fontRegular });
     yPosition = startY;
-      var isi_surat = `Bersama surat ini kami ${costumer.Jabatan} dalam menunjang pengelolaan sekolah di sekolah kami, maka dengan ini kami memohon kepada Bapak/Ibu Direktur ${PT} untuk melakukan Pembelanjaan Barang dan Jasa BOP SMK Negeri 69 Jakarta. 
+    var isi_surat = `Bersama surat ini kami ${costumer.Jabatan} dalam menunjang pengelolaan sekolah di sekolah kami, maka dengan ini kami memohon kepada Bapak/Ibu Direktur ${PT} untuk melakukan Pembelanjaan Barang dan Jasa BOP SMK Negeri 69 Jakarta. 
      \n\n Demikian permohonan ini kami sampaikan agar dapat Bapak/Ibu mengetahuinya dan segera menindaklanjuti, atas kerjasama yang baik kami ucapkan terima kasih. `;
-      const paragraphs = isi_surat.split('\n\n'); // pisah paragraf dengan double line break
-      paragraphs.forEach(paragraph => {
-        yPosition = drawParagraphJustify(page, paragraph.trim(), 100, yPosition, 400, 18, fontRegular, fontSize);
-        yPosition -= 18; // spasi antar paragraf
-      });
+    const paragraphs = isi_surat.split('\n\n'); // pisah paragraf dengan double line break
+    paragraphs.forEach(paragraph => {
+      yPosition = drawParagraphJustify(page, paragraph.trim(), 100, yPosition, 400, 18, fontRegular, fontSize);
+      yPosition -= 18; // spasi antar paragraf
+    });
 
- 
-      page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
+    page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
 
+    // Tulisan "Hormat kami" di bawah surat (misal di y=100)
+    page.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
+    page.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
 
-      // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-      page.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
-      page.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
-
-
-
-      // PAGE 2
+    // PAGE 2
     const page2 = pdfDoc.addPage([595, 842]); // A4
       
-      startX = 75;
-     startY = 842 - 100;
+    startX = 75;
+    startY = 842 - 100;
 
-       page2.drawText(`Lampiran`, { x: startX , y: startY, size: fontSize, font: fontRegular });
+    page2.drawText(`Lampiran`, { x: startX , y: startY, size: fontSize, font: fontRegular });
     page2.drawText(':', { x: startX  + 70, y: startY, size: fontSize, font: fontRegular });
     page2.drawText(`Surat Pesanan Belanja Barang dan Jasa BOP ${costumer.Sekolah}` || '-', { x: startX  + 80, y: startY, size: fontSize, font: fontRegular });
 
@@ -397,7 +393,6 @@ exports.generateBOPSurat = async (req, res) => {
     page2.drawText(`Tanggal`, { x: startX , y: startY -= 15, size: fontSize, font: fontRegular });
     page2.drawText(':', { x: startX  + 70, y: startY, size: fontSize, font: fontRegular });
     page2.drawText(tanggalFormatted || '-', { x: startX  + 80, y: startY, size: fontSize, font: fontRegular });
-      
 
     // Tabel Data Barang
     const columns = [
@@ -418,23 +413,14 @@ exports.generateBOPSurat = async (req, res) => {
       satuan: item.Satuan || '',
     }));
 
-   
     startY = drawTable(page2, startX , startY - 50, columns, rows, fontRegular, fontSize);
 
+    page2.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: 350, y: 170, size: fontSize, font: fontBold });
+    page2.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
 
-    // // Paragraf Penutup
-    // const penutup = `Demikian permohonan ini kami sampaikan, atas perhatian dan kerja samanya kami ucapkan terima kasih.`;
-    // bodyY = drawParagraphJustify(page, penutup, startX, bodyY - 10, 495, 18, fontRegular, fontSize);
-
-    // // Tanda Tangan
-    
-      page2.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: 350, y: 170, size: fontSize, font: fontBold });
-      page2.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
-
-
-      // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-      page2.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
-      page2.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
+    // Tulisan "Hormat kami" di bawah surat (misal di y=100)
+    page2.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
+    page2.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
 
     // Kirim PDF
     const pdfBytes = await pdfDoc.save();
@@ -451,7 +437,6 @@ exports.generateBOPSurat = async (req, res) => {
     res.status(500).send('Gagal membuat PDF');
   }
 };
-
 
 exports.generateSHP = async (req, res) => {
   const {
@@ -497,7 +482,6 @@ exports.generateSHP = async (req, res) => {
     const startX = 50;
     let startY = 842 - height - 40;
 
-    
     function drawLabelColonValue(label, value, y) {
       page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular });
       page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular });
@@ -515,36 +499,24 @@ exports.generateSHP = async (req, res) => {
     startY -= 30;
     page.drawText(tanggalFormatted, { x: 425, y: 842 - height - 40, size: fontSize, font: fontRegular });
 
-      // Tulis "Kepada Yth." bold
-  page.drawText('Kepada Yth.', { x: startX, y: startY, size: fontSize, font: fontBold });
+    // Tulis "Kepada Yth." bold
+    page.drawText('Kepada Yth.', { x: startX, y: startY, size: fontSize, font: fontBold });
     startY -= 15;
 
-  page.drawText('PT. Mastah Digital Teknologi', { x: startX , y: startY, size: fontSize, font: fontBold });
+    page.drawText('PT. Mastah Digital Teknologi', { x: startX , y: startY, size: fontSize, font: fontBold });
 
     startY -= 15;
 
-  // Baris berikutnya (isi 'kepada' dari form) bisa multiline
-  
+    // Tulis "Di tempat" dengan font reguler
+    page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontBold });
+    let yPosition = startY - 40; // beri jarak setelah bagian kepada yth
+    var isi_surat = "Sehubungan dengan pelaksanaan Operasional "  + costumer.Sekolah +" Tahun Anggaran 2025 untuk Belanja Barang dan Jasa BOS/BOP dari dana BOS/BOP sekolah untuk "+ tujuanBelanja+", kami membutuhkan :";
+    const paragraphs = isi_surat.split('\n\n'); // pisah paragraf dengan double line break
+    paragraphs.forEach(paragraph => {
+      yPosition = drawParagraphJustify(page, paragraph.trim(), 50, yPosition, 495, 18, fontRegular, fontSize);
+      yPosition -= 18; // spasi antar paragraf
+    });
 
-  // Tulis "Di tempat" dengan font reguler
-  page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontBold });
-  let yPosition = startY - 40; // beri jarak setelah bagian kepada yth
-  var isi_surat = "Sehubungan dengan pelaksanaan Operasional "  + costumer.Sekolah +" Tahun Anggaran 2025 untuk Belanja Barang dan Jasa BOS/BOP dari dana BOS/BOP sekolah untuk "+ tujuanBelanja+", kami membutuhkan :";
-  const paragraphs = isi_surat.split('\n\n'); // pisah paragraf dengan double line break
-  paragraphs.forEach(paragraph => {
-    yPosition = drawParagraphJustify(page, paragraph.trim(), 50, yPosition, 495, 18, fontRegular, fontSize);
-    yPosition -= 18; // spasi antar paragraf
-  });
-  
-  
-      // // Invoice info from DB
-      // drawLabelColonValue('Invoice ID', invoice.id.toString(), startY);
-      // startY -= 15;
-      // drawLabelColonValue('Tanggal Invoice', invoice.tanggal || '', startY);
-      // startY -= 15;
-      // drawLabelColonValue('Customer', costumer.nama || '', startY);
-      // startY -= 30;
- 
     startY = yPosition + 8;
     // Draw table title
 
@@ -567,40 +539,36 @@ exports.generateSHP = async (req, res) => {
       jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
     }));  
     
-     const summaryRows = [
+    const summaryRows = [
       { label: 'Jumlah', value: formatRupiah(invoice.Total) },
       { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
       { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
     ];
-   // Draw table with summary
+    // Draw table with summary
     startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
 
-
-  
-     
-  const penutup = "Dengan ini kami mengharapkan bantuan saudara agar dapat mengajukan penawaran harga ditunjukan kepada "+ costumer.Jabatan +", atas perhatian saudara saya ucapkan terima kasih.";
+    const penutup = "Dengan ini kami mengharapkan bantuan saudara agar dapat mengajukan penawaran harga ditunjukan kepada "+ costumer.Jabatan +", atas perhatian saudara saya ucapkan terima kasih.";
     yPosition = startY;
     yPosition = drawParagraphJustify(page, penutup.trim(), 50, yPosition -= 30, 495, 18, fontRegular, fontSize);
     yPosition -= 18; // spasi antar paragraf
  
-  page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
-  // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-  page.drawText(costumer.Nama, { x: 375, y: 50, size: fontSize, font: fontBold });
+    page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
+    // Tulisan "Hormat kami" di bawah surat (misal di y=100)
+    page.drawText(costumer.Nama, { x: 375, y: 50, size: fontSize, font: fontBold });
 
+    console.log('Mulai generate PDF');
+    const pdfBytes = await pdfDoc.save();
+    console.log('PDF selesai generate, size:', pdfBytes.length);
+    const buffer = Buffer.from(pdfBytes);
+    console.log('Buffer dibuat, size:', buffer.length);
 
-  console.log('Mulai generate PDF');
-  const pdfBytes = await pdfDoc.save();
-  console.log('PDF selesai generate, size:', pdfBytes.length);
-  const buffer = Buffer.from(pdfBytes);
-  console.log('Buffer dibuat, size:', buffer.length);
-
-  res.writeHead(200, {
-    'Content-Type': 'application/pdf',
-    'Content-Disposition': 'attachment; filename="surathargapenawaran.pdf"',
-    'Content-Length': buffer.length
-  });
-  res.end(buffer);
-  console.log('Response dikirim');
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="surathargapenawaran.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+    console.log('Response dikirim');
 
   } catch (err) {
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -677,13 +645,9 @@ exports.generateSPH = async (req, res) => {
     
     // Letter details
     startY -= 20;
-    
-   
 
     // Recipient
     page.drawText('Kepada Yth.', { x: startX, y: startY, size: fontSize, font: fontRegular });
-    // startY -= 15;
-    // page.drawText(costumer.Jabatan, { x: startX, y: startY, size: fontSize, font: fontRegular });
     startY -= 15;
     page.drawText(costumer.Sekolah, { x: startX, y: startY, size: fontSize, font: fontRegular });
     startY -= 15;
@@ -759,6 +723,145 @@ exports.generateSPH = async (req, res) => {
 
   } catch (err) {
     console.error('Gagal generate SPH PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+// Generate Undangan Negosiasi Harga Penawaran - Negotiation Invitation Letter
+exports.generateUndanganNegosiasi = async (req, res) => {
+  const {
+    nomor, lampiran, invoiceId, hariTanggal, waktu, tempat, alamat, acara, daerah
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+    console.log(costumer);
+    
+
+    // Load customer letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    const startX = 50;
+    let startY = 842 - height - 15;
+
+    // Letter header details
+    function drawLabelColonValue(label, value, y) {
+      page.drawText(label, { x: startX, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: startX + 70, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: startX + 90, y, size: fontSize, font: fontRegular });
+    }
+
+    drawLabelColonValue('Nomor', nomor || '', startY);
+    startY -= 15;
+    drawLabelColonValue('Lampiran', lampiran || '', startY);
+    startY -= 15;
+    drawLabelColonValue('Hal', 'Undangan Negosiasi', startY);
+    page.drawText('Harga Penawaran', { x: startX + 90, y: startY - 15, size: fontSize, font: fontRegular });
+
+    // Date (top right)
+    page.drawText(`${daerah}, ${tanggalFormatted}`, { x: 350, y: startY + 30, size: fontSize, font: fontRegular });
+
+    startY -= 20;
+
+          page.drawText('Kepada', { x: startX + 250, y: startY, size: fontSize, font: fontRegular });
+     startY -= 15;
+
+    const paragraphs = AlamatKantor.split('\n\n'); // pisah paragraf dengan double line break
+    paragraphs.forEach(paragraph => {
+          page.drawText(paragraph, { x: startX + 250, y: startY, size: fontSize, font: fontRegular });
+     startY -= 15;
+ // spasi antar paragraf
+    });
+
+    startY -= 40;
+
+    // Letter content
+    page.drawText('Dengan Hormat,', { x: startX, y: startY, size: fontSize, font: fontRegular });
+    startY -= 30;
+
+    let yPosition = startY;
+    const isi_surat = `Sehubungan dengan Penawaran Harga Belanja Barang dan Jasa BOP ${invoice.Kegiatan} pada ${costumer.Sekolah} yang saudara ajukan, setelah diadakan penelitian dan penilaian harga, maka kami berkesimpulan harga penawaran masih memungkinkan untuk diturunkan. Untuk itu kami mengundang Saudara mengadakan negosiasi pada:`;
+    
+    yPosition = drawParagraphJustify(page, isi_surat.trim(), startX, yPosition, 495, 18, fontRegular, fontSize);
+    yPosition -= 30;
+
+  function drawMeetingDetailWrapped(label, value, y) {
+  const labelX = startX + 20;
+  const colonX = startX + 120;
+  const valueX = startX + 140;
+  const maxWidth = 400; // max lebar teks isi
+
+  page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular });
+  page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular });
+
+  const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+  lines.forEach((line, i) => {
+    const lineY = y - i * (fontSize + 4);
+    page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+  });
+
+  return y - lines.length * (fontSize + 4);
+}
+
+    drawMeetingDetailWrapped('Hari/Tanggal', hariTanggal || 'Rabu, 11 Desember 2024', yPosition);
+    yPosition -= 18;
+    drawMeetingDetailWrapped('Waktu', waktu || 'Pukul 08.00 WIB - Selesai', yPosition);
+    yPosition -= 18;
+    drawMeetingDetailWrapped('Tempat', tempat || `Ruang Sidang ${costumer.Sekolah}`, yPosition);
+    yPosition -= 18;
+    drawMeetingDetailWrapped('Alamat', alamat || costumer.Alamat, yPosition);
+    yPosition -= 36;
+    drawMeetingDetailWrapped('Acara', acara || 'Negosiasi Harga Penawaran', yPosition);
+
+    yPosition -= 40;
+
+    // Closing
+    const penutup = 'Atas perhatian dan kehadiran Saudara, kami sampaikan terima kasih.';
+    yPosition = drawParagraphJustify(page, penutup.trim(), startX, yPosition, 495, 18, fontRegular, fontSize);
+
+     // Signature section (top right)
+    page.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: 350, y: 200, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Jabatan, { x: 350, y: 200 - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: 350, y: 200 - 100, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${costumer.NIP}`, { x: 350, y: 200 - 115, size: fontSize, font: fontRegular });
+
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="undangan-negosiasi.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate Undangan Negosiasi PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
   }
 };

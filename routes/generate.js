@@ -73,6 +73,7 @@ router.get('/:generateKey', async (req, res) => {
 router.post('/pdf/shp', generateController.generateSHP);
 router.post('/pdf/sph', generateController.generateSPH);
 router.post('/pdf/bop', generateController.generateBOPSurat);
+router.post('/pdf/undangan-negosiasi', generateController.generateUndanganNegosiasi);
 
 
 module.exports = router;
