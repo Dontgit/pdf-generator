@@ -1,0 +1,40 @@
+<%- include('../partials/header') %>
+<h1 class="text-2xl font-bold mb-4">Add New Invoice</h1>
+
+<form action="/invoice" method="POST" class="space-y-4 max-w-lg">
+  <div>
+    <label for="Kegiatan" class="block font-medium">Kegiatan <span class="text-red-600">*</span></label>
+    <input type="text" name="Kegiatan" id="Kegiatan" required class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Sekolah" class="block font-medium">Sekolah</label>
+    <input type="text" name="Sekolah" id="Sekolah" class="w-full border rounded px-3 py-2" />
+  </div>
+ 
+    <input type="hidden" step="0.01" value="0"  name="Total" id="Total" class="w-full border rounded px-3 py-2" />
+  
+
+  
+  <input type="hidden" step="0.01" value="0" name="PPN" id="PPN" class="w-full border rounded px-3 py-2" readonly />
+ 
+  <input type="hidden" step="0.01" value="0" name="Total_Harga" id="Total_Harga" class="w-full border rounded px-3 py-2" readonly />
+ 
+  <div>
+    <label for="Costumer_id" class="block font-medium">Costumer</label>
+    <select name="Costumer_id" id="Costumer_id" class="w-full border rounded px-3 py-2">
+      <option value="">-- Select Costumer --</option>
+      <% if (typeof costumers !== 'undefined') { %>
+        <% costumers.forEach(costumer => { %>
+          <option value="<%= costumer.id %>"><%= costumer.Nama %></option>
+        <% }) %>
+      <% } %>
+    </select>
+  </div>
+  <div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Save
+    </button>
+    <a href="/invoice" class="ml-4 text-gray-600 hover:underline">Cancel</a>
+  </div>
+</form>
+<%- include('../partials/footer') %>

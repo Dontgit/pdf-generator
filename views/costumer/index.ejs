@@ -1,0 +1,67 @@
+
+<%- include('../partials/header') %>
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-bold">Costumer List</h1>
+  <a href="/costumer/new" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <i class="fa fa-plus"></i> Add New
+  </a>
+</div>
+
+<table class="min-w-full bg-white rounded shadow">
+  <thead>
+    <tr>
+      <th class="py-2 px-4 border-b">ID</th>
+      <th class="py-2 px-4 border-b">Kop Surat</th>
+      <th class="py-2 px-4 border-b">Jabatan</th>
+      <th class="py-2 px-4 border-b">Nama</th>
+      <th class="py-2 px-4 border-b">NIP</th>
+      <th class="py-2 px-4 border-b">Sekolah</th>
+      <th class="py-2 px-4 border-b">Alamat</th>
+      <th class="py-2 px-4 border-b">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% costumers.forEach(costumer => { %>
+      <tr>
+        <td class="py-2 px-4 border-b"><%= costumer.id %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.kop_surat %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.Jabatan %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.Nama %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.NIP %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.Sekolah %></td>
+        <td class="py-2 px-4 border-b"><%= costumer.Alamat %></td>
+        <td class="py-2 px-4 border-b">
+          <a href="/costumer/<%= costumer.id %>/edit" class="text-blue-600 hover:underline mr-2">
+            <i class="fa fa-edit"></i>
+          </a>
+          <form action="/costumer/<%= costumer.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)">
+            <button type="submit" class="text-red-600 hover:underline">
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<script>
+  function confirmDelete(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will delete the costumer record.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        event.target.submit();
+      }
+    });
+    return false;
+  }
+</script>
+<%- include('../partials/footer') %>

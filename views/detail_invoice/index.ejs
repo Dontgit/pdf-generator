@@ -1,0 +1,70 @@
+
+
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-bold">Detail Invoice List</h1>
+  <a href="/detail_invoice/new" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <i class="fa fa-plus"></i> Add New
+  </a>
+</div>
+
+<table class="min-w-full bg-white rounded shadow">
+  <thead>
+    <tr>
+      <th class="py-2 px-4 border-b">ID</th>
+      <th class="py-2 px-4 border-b">Nama Barang</th>
+      <th class="py-2 px-4 border-b">Volume</th>
+      <th class="py-2 px-4 border-b">Qty</th>
+      <th class="py-2 px-4 border-b">Satuan</th>
+      <th class="py-2 px-4 border-b">Harga Satuan</th>
+      <th class="py-2 px-4 border-b">Jumlah</th>
+      <th class="py-2 px-4 border-b">Kondisi</th>
+      <th class="py-2 px-4 border-b">Invoice ID</th>
+      <th class="py-2 px-4 border-b">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% details.forEach(detail => { %>
+      <tr>
+        <td class="py-2 px-4 border-b"><%= detail.id %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Nama_Barang %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Volume %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Qty %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Satuan %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Harga_Satuan %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Jumlah %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Kondisi %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Invoice_id %></td>
+        <td class="py-2 px-4 border-b">
+          <a href="/detail_invoice/<%= detail.id %>/edit" class="text-blue-600 hover:underline mr-2">
+            <i class="fa fa-edit"></i>
+          </a>
+          <form action="/detail_invoice/<%= detail.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)">
+            <button type="submit" class="text-red-600 hover:underline">
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<script>
+  function confirmDelete(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will delete the detail invoice record.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        event.target.submit();
+      }
+    });
+    return false;
+  }
+</script>

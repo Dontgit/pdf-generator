@@ -1,0 +1,49 @@
+
+
+<h1 class="text-2xl font-bold mb-4">Add New Detail Invoice</h1>
+
+<form action="/detail_invoice" method="POST" class="space-y-4 max-w-lg">
+  <div>
+    <label for="Nama_Barang" class="block font-medium">Nama Barang <span class="text-red-600">*</span></label>
+    <input type="text" name="Nama_Barang" id="Nama_Barang" required class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Volume" class="block font-medium">Volume</label>
+    <input type="number" step="0.01" name="Volume" id="Volume" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Qty" class="block font-medium">Qty</label>
+    <input type="number" name="Qty" id="Qty" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Satuan" class="block font-medium">Satuan</label>
+    <input type="text" name="Satuan" id="Satuan" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Harga_Satuan" class="block font-medium">Harga Satuan</label>
+    <input type="number" step="0.01" name="Harga_Satuan" id="Harga_Satuan" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Jumlah" class="block font-medium">Jumlah</label>
+    <input type="number" step="0.01" name="Jumlah" id="Jumlah" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Kondisi" class="block font-medium">Kondisi</label>
+    <input type="text" name="Kondisi" id="Kondisi" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Invoice_id" class="block font-medium">Invoice</label>
+    <select name="Invoice_id" id="Invoice_id" class="w-full border rounded px-3 py-2">
+      <option value="">-- Select Invoice --</option>
+      <% invoices.forEach(invoice => { %>
+        <option value="<%= invoice.id %>"><%= invoice.Kegiatan %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Save
+    </button>
+    <a href="/detail_invoice" class="ml-4 text-gray-600 hover:underline">Cancel</a>
+  </div>
+</form>

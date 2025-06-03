@@ -1,0 +1,41 @@
+<%- include('../partials/header') %>
+<h1 class="text-3xl font-bold mb-6">Generate Dokumen</h1>
+
+<div class="mb-6">
+  <label for="invoiceSelect" class="block mb-2 font-semibold text-gray-700">Pilih Invoice:</label>
+  <select id="invoiceSelect" required class="w-full max-w-md px-4 py-2 border border-gray-300 rounded shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <option value="">-- Pilih Invoice --</option>
+    <% invoices.forEach(inv => { %>
+      <option value="<%= inv.id %>"><%= inv.Kegiatan %> </option>
+    <% }) %>
+  </select>
+</div>
+
+<h2 class="text-2xl font-semibold mb-4">Pilih Jenis Generate:</h2>
+<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 max-w-4xl">
+  <% generateMenus.forEach(menu => { %>
+    <button
+      class="generate-btn bg-blue-600 text-white font-medium py-2 px-4 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+      data-key="<%= menu.key %>"
+      type="button"
+    >
+      <%= menu.label %>
+    </button>
+  <% }) %>
+</div>
+
+<script>
+  document.querySelectorAll('.generate-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const invoiceId = document.getElementById('invoiceSelect').value;
+      if (!invoiceId) {
+        alert('Silakan pilih invoice terlebih dahulu!');
+        return;
+      }
+      const key = btn.getAttribute('data-key');
+      // Redirect ke URL generate dengan query param invoiceId
+      window.location.href = `/generate/${key}?invoiceId=${invoiceId}`;
+    });
+  });
+</script>
+<%- include('../partials/footer') %>

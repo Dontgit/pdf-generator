@@ -1,0 +1,341 @@
+
+
+<%- include('../partials/header') %>
+<div class="flex justify-between items-center mb-4">
+  <h1 class="text-2xl font-bold">Invoice List</h1>
+  <a href="/invoice/new" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    <i class="fa fa-plus"></i> Add New
+  </a>
+</div>
+
+<table class="min-w-full bg-white rounded shadow">
+  <thead>
+    <tr>
+      <th class="py-2 px-4 border-b">ID</th>
+      <th class="py-2 px-4 border-b">Kegiatan</th>
+      <th class="py-2 px-4 border-b">Sekolah</th>
+      <th class="py-2 px-4 border-b">Total</th>
+      <th class="py-2 px-4 border-b">PPN</th>
+      <th class="py-2 px-4 border-b">Total Harga</th>
+      <th class="py-2 px-4 border-b">Costumer ID</th>
+      <th class="py-2 px-4 border-b">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% invoices.forEach(invoice => { %>
+      <tr>
+        <td class="py-2 px-4 border-b"><%= invoice.id %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Kegiatan %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Sekolah %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Total %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.PPN %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Total_Harga %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Costumer_id %></td>
+        <td class="py-2 px-4 border-b">
+          <button onclick="openDetailModal(<%= invoice.id %>)" class="text-green-600 hover:underline mr-2" title="View Details">
+            <i class="fa fa-list"></i>
+          </button>
+          <a href="/invoice/<%= invoice.id %>/edit" class="text-blue-600 hover:underline mr-2" title="Edit Invoice">
+            <i class="fa fa-edit"></i>
+          </a>
+          <form action="/invoice/<%= invoice.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)">
+            <button type="submit" class="text-red-600 hover:underline" title="Delete Invoice">
+              <i class="fa fa-trash"></i>
+            </button>
+          </form>
+        </td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+<!-- Detail Invoice Modal -->
+<div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-4/5 max-w-4xl p-6 overflow-auto max-h-[80vh]">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-xl font-bold">Detail Invoice</h2>
+      <button onclick="closeDetailModal()" class="text-gray-600 hover:text-gray-900">
+        <i class="fa fa-times"></i>
+      </button>
+    </div>
+    <div>
+      <table class="min-w-full bg-white rounded shadow mb-4">
+        <thead>
+          <tr>
+            <th class="py-2 px-4 border-b">Nama Barang</th>
+            <th class="py-2 px-4 border-b">Volume</th>
+            <th class="py-2 px-4 border-b">Qty</th>
+            <th class="py-2 px-4 border-b">Satuan</th>
+            <th class="py-2 px-4 border-b">Harga Satuan</th>
+            <th class="py-2 px-4 border-b">Jumlah</th>
+            <th class="py-2 px-4 border-b">Kondisi</th>
+            <th class="py-2 px-4 border-b">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="detailInvoiceBody">
+          <!-- Detail invoice rows will be dynamically inserted here -->
+        </tbody>
+      </table>
+      <button onclick="showAddDetailForm()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
+        Add Detail
+      </button>
+      <form id="addDetailForm" class="space-y-2 hidden">
+        <input type="hidden" id="detailInvoiceId" />
+        <input type="hidden" id="detailInvoiceInvoiceId" />
+        <div>
+          <label for="Nama_Barang" class="block font-medium">Nama Barang</label>
+          <input type="text" id="Nama_Barang" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+  <label for="Volume" class="block font-medium">Volume</label>
+  <input type="number" id="Volume" class="w-full border rounded px-3 py-2" oninput="syncQty()" />
+</div>
+<div>
+  <label for="Qty" class="block font-medium">Qty</label>
+  <input type="number" id="Qty" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+</div>
+<div>
+  <label for="Harga_Satuan" class="block font-medium">Harga Satuan</label>
+  <input type="number" id="Harga_Satuan" class="w-full border rounded px-3 py-2" oninput="calculateJumlah()" />
+</div>
+<div>
+  <label for="Jumlah" class="block font-medium">Jumlah</label>
+  <input type="number" id="Jumlah" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+</div>
+
+        <div>
+          <label for="Kondisi" class="block font-medium">Kondisi</label>
+          <input type="text" id="Kondisi" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <button type="button" onclick="submitDetailForm()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+            Save
+          </button>
+          <button type="button" onclick="hideAddDetailForm()" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmDelete(event) {
+    event.preventDefault();
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will delete the invoice record.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        event.target.submit();
+      }
+    });
+    return false;
+  }
+
+  let currentInvoiceId = null;
+
+  function openDetailModal(invoiceId) {
+    currentInvoiceId = invoiceId;
+    document.getElementById('detailModal').classList.remove('hidden');
+    loadDetailInvoice(invoiceId);
+  }
+
+  function closeDetailModal() {
+    document.getElementById('detailModal').classList.add('hidden');
+    clearDetailInvoiceTable();
+    hideAddDetailForm();
+  }
+
+  function loadDetailInvoice(invoiceId) {
+    console.log(invoiceId);
+    fetch(`/detail_invoice/api/${invoiceId}`)
+      .then(response => response.json())
+      .then(data => {
+      
+        populateDetailInvoiceTable(data);
+      })
+      .catch(error => {
+        console.error('Error loading detail invoice:', error);
+      });
+  }
+
+function populateDetailInvoiceTable(details) {
+  const tbody = document.getElementById('detailInvoiceBody');
+  tbody.innerHTML = '';
+  console.log(
+    details
+  );
+  
+  details.forEach(detail => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="py-2 px-4 border-b">${detail.Nama_Barang || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Volume || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Qty || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Satuan || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Harga_Satuan || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Jumlah || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Kondisi || ''}</td>
+      <td class="py-2 px-4 border-b text-center">
+        <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:underline mr-2">
+          <i class="fa fa-edit"></i>
+        </button>
+        <button onclick="deleteDetail(${detail.id})" class="text-red-600 hover:underline">
+          <i class="fa fa-trash"></i>
+        </button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+
+  function clearDetailInvoiceTable() {
+    document.getElementById('detailInvoiceBody').innerHTML = '';
+  }
+
+  function showAddDetailForm() {
+    document.getElementById('addDetailForm').classList.remove('hidden');
+    clearDetailForm();
+  }
+
+  function hideAddDetailForm() {
+    document.getElementById('addDetailForm').classList.add('hidden');
+    clearDetailForm();
+  }
+
+  function clearDetailForm() {
+    document.getElementById('detailInvoiceId').value = '';
+    document.getElementById('detailInvoiceInvoiceId').value = currentInvoiceId;
+    document.getElementById('Nama_Barang').value = '';
+    document.getElementById('Volume').value = '';
+    document.getElementById('Qty').value = '';
+    document.getElementById('Satuan').value = '';
+    document.getElementById('Harga_Satuan').value = '';
+    document.getElementById('Jumlah').value = '';
+    document.getElementById('Kondisi').value = '';
+  }
+
+  function submitDetailForm() {
+    const id = document.getElementById('detailInvoiceId').value;
+    const invoiceId = currentInvoiceId;
+    const data = {
+      Nama_Barang: document.getElementById('Nama_Barang').value,
+      Volume: parseFloat(document.getElementById('Volume').value),
+      Qty: parseFloat(document.getElementById('Qty').value),
+      Satuan: document.getElementById('Satuan').value,
+      Harga_Satuan: parseFloat(document.getElementById('Harga_Satuan').value),
+      Jumlah: parseFloat(document.getElementById('Jumlah').value),
+      Kondisi: document.getElementById('Kondisi').value,
+      Invoice_id: invoiceId
+    };
+    console.log(JSON.stringify(data));
+
+    if (id) {
+      // Update 
+      fetch(`/detail_invoice/api/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(() => {
+        loadDetailInvoice(invoiceId);
+        hideAddDetailForm();
+      })
+      .catch(error => {
+        console.error('Error updating detail:', error);
+      });
+    } else {
+      // Create new detail
+      fetch('/detail_invoice/api', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(() => {
+        loadDetailInvoice(invoiceId);
+        hideAddDetailForm();
+      })
+      .catch(error => {
+        console.error('Error creating detail:', error);
+      });
+    }
+  }
+function syncQty() {
+  const volume = parseFloat(document.getElementById('Volume').value);
+  if (!isNaN(volume)) {
+    document.getElementById('Qty').value = volume;
+  } else {
+    document.getElementById('Qty').value = '';
+  }
+  calculateJumlah(); // Recalculate Jumlah if volume changes
+}
+
+function calculateJumlah() {
+  const qty = parseFloat(document.getElementById('Qty').value);
+  const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan').value);
+  if (!isNaN(qty) && !isNaN(hargaSatuan)) {
+    document.getElementById('Jumlah').value = qty * hargaSatuan;
+  } else {
+    document.getElementById('Jumlah').value = '';
+  }
+}
+
+  function editDetail(id) {
+    fetch(`/detail_invoice/api/${currentInvoiceId}`)
+      .then(response => response.json())
+      .then(details => {
+        const detail = details.find(d => d.id === id);
+        if (detail) {
+          document.getElementById('detailInvoiceId').value = detail.id;
+          document.getElementById('detailInvoiceInvoiceId').value = detail.Invoice_id;
+          document.getElementById('Nama_Barang').value = detail.Nama_Barang;
+          document.getElementById('Volume').value = detail.Volume;
+          document.getElementById('Qty').value = detail.Qty;
+          document.getElementById('Satuan').value = detail.Satuan;
+          document.getElementById('Harga_Satuan').value = detail.Harga_Satuan;
+          document.getElementById('Jumlah').value = detail.Jumlah;
+          document.getElementById('Kondisi').value = detail.Kondisi;
+          showAddDetailForm();
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching detail for edit:', error);
+      });
+  }
+
+  function deleteDetail(id) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "This will delete the detail invoice item.",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        fetch(`/detail_invoice/api/${id}`, {
+          method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(() => {
+          loadDetailInvoice(currentInvoiceId);
+        })
+        .catch(error => {
+          console.error('Error deleting detail:', error);
+        });
+      }
+    });
+  }
+</script>
+<%- include('../partials/footer') %>

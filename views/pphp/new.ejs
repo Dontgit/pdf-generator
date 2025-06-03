@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<h1 class="text-2xl font-bold mb-4">Add New PPHP</h1>
+
+<form action="/pphp" method="POST" class="space-y-4 max-w-lg">
+  <div>
+    <label for="Nama" class="block font-medium">Nama <span class="text-red-600">*</span></label>
+    <input type="text" name="Nama" id="Nama" required class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="NIP" class="block font-medium">NIP</label>
+    <input type="text" name="NIP" id="NIP" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="NIKKI" class="block font-medium">NIKKI</label>
+    <input type="text" name="NIKKI" id="NIKKI" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Invoice_id" class="block font-medium">Invoice</label>
+    <select name="Invoice_id" id="Invoice_id" class="w-full border rounded px-3 py-2">
+      <option value="">-- Select Invoice --</option>
+      <% invoices.forEach(invoice => { %>
+        <option value="<%= invoice.id %>"><%= invoice.Kegiatan %></option>
+      <% }) %>
+    </select>
+  </div>
+  <div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Save
+    </button>
+    <a href="/pphp" class="ml-4 text-gray-600 hover:underline">Cancel</a>
+  </div>
+</form>
+<%- include('../partials/footer') %>

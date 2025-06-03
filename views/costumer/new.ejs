@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<h1 class="text-2xl font-bold mb-4">Add New Costumer</h1>
+
+<form action="/costumer" method="POST" enctype="multipart/form-data" class="space-y-4 max-w-lg">
+  <div>
+    <label for="kop_surat" class="block font-medium">Kop Surat</label>
+    <input type="file" name="kop_surat" id="kop_surat" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Jabatan" class="block font-medium">Jabatan</label>
+    <input type="text" name="Jabatan" id="Jabatan" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Nama" class="block font-medium">Nama <span class="text-red-600">*</span></label>
+    <input type="text" name="Nama" id="Nama" required class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="NIP" class="block font-medium">NIP</label>
+    <input type="text" name="NIP" id="NIP" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Sekolah" class="block font-medium">Sekolah</label>
+    <input type="text" name="Sekolah" id="Sekolah" class="w-full border rounded px-3 py-2" />
+  </div>
+  <div>
+    <label for="Alamat" class="block font-medium">Alamat</label>
+    <textarea name="Alamat" id="Alamat" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+  </div>
+  <div>
+    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+      Save
+    </button>
+    <a href="/costumer" class="ml-4 text-gray-600 hover:underline">Cancel</a>
+  </div>
+</form>
+<%- include('../partials/footer') %>
