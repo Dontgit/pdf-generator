@@ -1,0 +1,28 @@
+<%- include('../../partials/header') %>
+
+<div class="max-w-3xl mx-auto p-6 mt-10 bg-white shadow-lg rounded-lg">
+  <h2 class="text-2xl font-bold mb-6 text-center">Generate Berita Acara Penerimaan Barang</h2>
+
+  <form action="/generate/pdf/berita-acara-penerimaan" method="POST" class="space-y-5">
+<input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <!-- Nomor Surat -->
+    <div>
+      <label for="nomor" class="block font-semibold text-gray-700">Nomor Surat</label>
+      <input type="text" id="nomor" name="nomor" required
+             class="w-full mt-1 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+
+    <!-- Tombol Submit -->
+    <div class="flex justify-between items-center pt-4">
+      <a href="/generate" class="text-gray-600 hover:underline">← Kembali</a>
+      <button type="submit"
+              class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-md shadow font-semibold transition">
+        Generate PDF
+      </button>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

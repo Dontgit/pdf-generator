@@ -2,10 +2,8 @@ const pool = require('../db');
 const path = require('path');
 const fs = require('fs');
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
-const { start } = require('repl');
 
-const { response } = require('express');    
-const { title } = require('process');
+// Remove unused imports
 
 
 const bulan = [
@@ -1883,6 +1881,156 @@ exports.generateTemplate = async (req, res) => {
 };
 
 
+exports.generateBeritaAcaraPenerimaan = async (req, res) => {
+  const {
+    nomor, invoiceId, 
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Load customer letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    const startX = 70;
+    let startY = 842 - height - 40;
+
+    // Title
+    const titleText = 'BERITA ACARA PENERIMAAN PEMELIHARAAN SARANA DAN PRASARANA';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    // Letter header details
+    function drawLabelColonValue(label, value, y, x, colon = 100, end = 120) {
+      page.drawText(label, { x: x, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: x + colon, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: x + end, y, size: fontSize, font: fontRegular });
+    }
+
+    startY -= 15;
+    drawLabelColonValue('Nomor', nomor || '', startY, centerX + titleWidth / 3, 35, 40);
+    startY -= 30;
+
+    // Content
+    let yPosition = startY;
+    const introText = `Yang bertanda tangan dibawah ini:`;
+    yPosition = drawParagraphJustify(page, introText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+    yPosition -= 20;
+     // Company details
+    function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 120;
+      const valueX = startX + 140;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular });
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+
+    yPosition = drawDetailWrapped('Direktur', Direktur, yPosition);
+    yPosition = drawDetailWrapped('Jabatan', `${JabatanPT}`, yPosition);
+    yPosition = drawDetailWrapped('Alamat Perusahaan', AlamatKantor2, yPosition);
+    yPosition = drawDetailWrapped('No.NPWP', NPWP, yPosition);
+    page.drawText('Selanjutnya disebut PIHAK PERTAMA', { x: startX, y: yPosition, size: fontSize, font: fontRegular });
+    
+    yPosition -= 25;
+    yPosition = drawDetailWrapped('Nama', costumer.Nama, yPosition);
+    yPosition = drawDetailWrapped('NIP', `${costumer.NIP}`, yPosition);
+    yPosition = drawDetailWrapped('Jabatan', 'Pejabat Pelaksana Teknis Kegiatan', yPosition);
+    yPosition = drawDetailWrapped('Alamat', costumer.Alamat, yPosition);
+    page.drawText('Selanjutnya disebut PIHAK KEDUA', { x: startX, y: yPosition, size: fontSize, font: fontRegular });
+    yPosition -= 25;
+    
+    // Main content
+    const mainContent = `PIHAK PERTAMA telah menyerahkan kepada PIHAK KEDUA, barang pesanan Pejabat Pelaksana Teknis Kegiatan ${costumer.Sekolah} berupa belanja ${invoice.Kegiatan} yang dipesan untuk ${costumer.Sekolah} dalam keadaan baik dan jumlah cukup.`;
+    yPosition = drawParagraphJustify(page, mainContent.trim(), startX, yPosition, 450, 18, fontRegular, fontSize,'');
+    const mainContent2 = `Bahwa PIHAK KEDUA telah menerima dari PIHAK PERTAMA barang pesanan tersebut seluruhnya dengan baik dan lengkap, maka PIHAK PERTAMA berhak menerima pembayaran sebesar Rp. ${invoice.Total_Harga} ,- (${terbilangManual(invoice.Total_Harga)}).`;
+    yPosition = drawParagraphJustify(page, mainContent2.trim(), startX, yPosition, 450, 18, fontRegular, fontSize,'');
+    yPosition -= 20;
+    
+    
+    console.log("test");
+    // Closing paragraph
+    const closingText = `Demikian Berita Acara ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana semestinya.`;
+    yPosition = drawParagraphJustify(page, closingText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+    yPosition -= 30;
+
+    // Signatures
+    
+        // Right signature
+    page.drawText('PIHAK KEDUA', { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: startX  , y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(costumer.NIP, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+    // Left signature
+    page.drawText('PIHAK PERTAMA', { x: startX + 300  , y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(PT, { x: startX + 300 , y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(JabatanPT, { x: startX + 300 , y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(Direktur, { x: startX + 300 , y: yPosition - 95, size: fontSize, font: fontRegular });
+
+    // Save and send PDF
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="berita-acara-penerimaan.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate Berita Acara Penerimaan PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
 exports.generateFaktur = async (req, res) => {
   const {
     nomor, invoiceId,daerah, rekening,atasnama,bank
@@ -2449,6 +2597,421 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
 
   } catch (err) {
     console.error('Gagal generate Berita Acara Serah Terima PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+
+
+exports.generateKwitansi = async (req, res) => {
+  const {
+    nomor, invoiceId,daerah,tanggalsurat,diterima,pembayaran,bank,atasnama,rekening
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 40;
+function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 130;
+      const valueX = startX + 150;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontBold });
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontBold });
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+
+    // Title
+    const titleText = 'KWITANSI';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    // Letter header details
+    function drawLabelColonValue(label, value, y, x, colon = 100, end = 120) {
+      page.drawText(label, { x: x, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: x + colon, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: x + end, y, size: fontSize, font: fontRegular });
+    }
+
+    startY -= 15;
+    drawLabelColonValue('Nomor', nomor || '', startY,centerX - 30, 35, 40);
+    startY -= 40;
+
+    yPosition  = startY;
+    yPosition = drawDetailWrapped('Sudah Diterima Dari', diterima, yPosition);
+    yPosition = drawDetailWrapped('Uang Sebanyak', `${terbilangManual(invoice.Total_Harga)}`, yPosition);
+    yPosition = drawDetailWrapped('Untuk Pembayaran', `Kegiatan Pemeliharaan Sarana dan Prasarana Sekolah pada ${costumer.Sekolah} sesuai dengan faktur terlampir.`, yPosition);
+    yPosition -= 30;
+     yPosition = drawDetailWrapped('Pembayaran', pembayaran, yPosition);
+    yPosition = drawDetailWrapped('Bank', `${bank}`, yPosition);
+    yPosition = drawDetailWrapped('No Rekening', rekening, yPosition);
+    yPosition = drawDetailWrapped('Atas Nama', atasnama, yPosition);
+    yPosition -= 25;
+
+
+    
+    yPosition = drawDetailWrapped('Jumlah', `Rp ${invoice.Total_Harga}`, yPosition);
+    
+       // Left signature (PIHAK KEDUA)
+       startX += 280;
+    page.drawText(`${daerah}, ${formatTanggalIndonesia(tanggalsurat)}`, { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(PT, { x: startX, y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(JabatanPT, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(Direktur, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="kwitansi.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate Kwitansi PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+
+exports.generateDokumenPerencanaan = async (req, res) => {
+  const {
+    invoiceId,kategori,tanggalserahterima
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 40;
+ // Title
+    const titleText = 'DOKUMEN PERENCANAAN';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 180;
+      const valueX = startX + 200;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontBold });
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontBold });
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+    startY-= 20;
+     yPosition  = startY;
+    yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition);
+    yPosition = drawDetailWrapped('Alamat Satuan Pendidikan ', costumer.Alamat, yPosition);
+    yPosition = drawDetailWrapped('Katagori Barang/Jasa		', kategori, yPosition);
+    yPosition -= 30;
+
+    startY = yPosition;
+     // Table
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Jenis', key: 'jenis', width: 150 },
+      { header: 'Keterangan', key: 'keterangan', width: 300 },
+      
+      
+    ];
+    
+
+    const rows = [
+  {
+    no: '1',
+    jenis: 'Jumlah Barang/Jasa',
+    keterangan: '1 Paket Pekerjaan',
+  },
+  {
+    no: '2',
+    jenis: 'Spesifikasi/ruang lingkup barang/jasa',
+    keterangan: `Belanja ${invoice.Kegiatan} termasuk bahan dan jasa`,
+  },
+  {
+    no: '3',
+    jenis: 'Waktu serah terima',
+    keterangan: `${formatTanggalIndonesia(tanggalserahterima)}`,
+  },
+  {
+    no: '4',
+    jenis: 'Lokasi serah terima',
+    keterangan: costumer.Alamat,
+  },
+  {
+    no: '5',
+    jenis: 'Alokasi Anggaran',
+    keterangan: 'BOP',
+  },
+  {
+    no: '6',
+    jenis: 'Persyaratan Penyedia',
+    keterangan: `Perorangan/ Badan Usaha Memenuhi syarat sebagai berikut: a. Identitas penyedia b. NPWP c. dst`,
+  },
+];
+
+    startY = drawTable(page, startX, startY, columns, rows,  fontRegular, fontSize);
+
+      yPosition = startY - 50;
+       // Left signature (PIHAK KEDUA)
+       startX += 280;
+    page.drawText(`Pejabat Pelaksana Teknis Kegiatan`, { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(costumer.Jabatan, { x: startX, y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${costumer.NIP}`, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+
+    
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="dokumen-perencanaan.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate Dokumen Perencanaan PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+exports.generateHPS = async (req, res) => {
+  const {
+    invoiceId
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 40;
+ // Title
+    const titleText = 'HARGA PERKIRAAN SENDIRI (HPS)';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 150;
+      const valueX = startX + 170;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+    startY-= 20;
+    yPosition  = startY;
+    yPosition = drawDetailWrapped('Organisasi/SKPD', costumer.Sekolah, yPosition);
+    yPosition = drawDetailWrapped('Rincian Kegiatan', invoice.Kegiatan, yPosition);
+    yPosition = drawDetailWrapped('Tahun Anggaran', `${tahun}`, yPosition);
+    console.log(tahun);
+         yPosition -= 30;
+
+
+    // Table
+    startY = yPosition + 8;
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Volume', key: 'volume', width: 60 },
+      { header: 'Satuan', key: 'satuan', width: 60 },
+      { header: 'Harga Satuan', key: 'harga', width: 80 },
+      { header: 'Jumlah', key: 'jumlah', width: 60 },
+    ];
+
+    const rows = detail_invoice.map((item, idx) => ({
+      no: (idx + 1).toString(),
+      namabarang: item.Nama_Barang || '',
+      volume: item.Volume ? item.Volume.toString() : '',
+      satuan: item.Satuan ? item.Satuan.toString() : '',
+      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
+      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+    }));
+
+    const summaryRows = [
+      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+    ];
+
+    startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
+    yPosition = startY - 50;
+       // Left signature (PIHAK KEDUA)
+       startX += 280;
+    page.drawText(`Pejabat Pelaksana Teknis Kegiatan`, { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(costumer.Jabatan, { x: startX, y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${costumer.NIP}`, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+
+
+    
+    const pdfBytes = await pdfDoc.save();
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="hps.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+
+  } catch (err) {
+    console.error('Gagal generate HPS PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
   }
 };

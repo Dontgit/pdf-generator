@@ -81,8 +81,12 @@ router.post('/pdf/surat-jalan', generateController.generateSuratJalan);
 router.post('/pdf/surat-serah-terima', generateController.generateSuratSerahTerima);
 router.post('/pdf/spk', generateController.generateSPK);
 router.post('/pdf/faktur', generateController.generateFaktur);
+router.post('/pdf/kwitansi', generateController.generateKwitansi);
+router.post('/pdf/perencanaan', generateController.generateDokumenPerencanaan);
+router.post('/pdf/hps', generateController.generateHPS);
 router.post('/pdf/berita-acara-pemeriksaan', generateController.generateBeritaAcaraPemeriksaan);
 router.post('/pdf/berita-acara-serah-terima', generateController.generateBeritaAcaraSerahTerima);
+router.post('/pdf/berita-acara-penerimaan', generateController.generateBeritaAcaraPenerimaan);
 
 
 module.exports = router;

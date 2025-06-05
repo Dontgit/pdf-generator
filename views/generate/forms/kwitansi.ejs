@@ -1,0 +1,69 @@
+<%- include('../../partials/header') %>
+
+<div class="max-w-3xl mx-auto p-6 mt-10 bg-white shadow rounded-lg">
+  <h2 class="text-2xl font-bold text-center mb-6">Generate Kwitansi Pembayaran</h2>
+
+  <form action="/generate/pdf/kwitansi" method="POST" class="space-y-5">
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <div>
+      <label for="nomor" class="block font-medium text-gray-700">Nomor Kwitansi</label>
+      <input type="text" id="nomor" name="nomor" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+
+    <div>
+      <label for="daerah" class="block font-medium text-gray-700">Daerah</label>
+      <input type="text" id="daerah" name="daerah" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="tanggalsurat" class="block font-medium text-gray-700">Tanggal Surat</label>
+      <input type="date" id="tanggalsurat" name="tanggalsurat" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="diterima" class="block font-medium text-gray-700">Sudah Diterima Dari</label>
+      <input type="text" id="diterima" name="diterima" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="pembayaran" class="block font-medium text-gray-700">Pembayaran Via</label>
+      <input type="text" id="pembayaran" name="pembayaran" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="bank" class="block font-medium text-gray-700">Bank</label>
+      <input type="text" id="bank" name="bank" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="rekening" class="block font-medium text-gray-700">Nomor Rekening</label>
+      <input type="text" id="rekening" name="rekening" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div>
+      <label for="atasnama" class="block font-medium text-gray-700">Atas Nama</label>
+      <input type="text" id="atasnama" name="atasnama" required
+        class="w-full mt-1 rounded border-gray-300 focus:ring-blue-500 focus:border-blue-500">
+    </div>
+
+    <div class="flex justify-between pt-6">
+      <a href="/generate" class="text-gray-600 hover:underline">← Kembali</a>
+      <button type="submit"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded shadow font-semibold transition">
+        Generate PDF
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

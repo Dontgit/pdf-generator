@@ -1,0 +1,34 @@
+<%- include('../../partials/header') %>
+
+<div class="max-w-2xl mx-auto bg-white p-6 rounded shadow mt-8">
+  <h2 class="text-xl font-semibold mb-4 text-center">Generate Dokumen Perencanaan</h2>
+
+  <form action="/generate/pdf/perencanaan" method="POST" class="space-y-4">
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <!-- Kategori Barang/Jasa -->
+    <div>
+      <label for="kategori" class="block text-sm font-medium text-gray-700">Kategori Barang/Jasa</label>
+      <select id="kategori" name="kategori" class="mt-1 block w-full border rounded p-2 focus:outline-none focus:ring focus:ring-blue-200" required>
+        <option value="" disabled selected>Pilih kategori...</option>
+        <option value="Barang">Barang</option>
+        <option value="Jasa">Jasa</option>
+        <option value="Lainnya">Lainnya</option>
+      </select>
+    </div>
+
+    <!-- Tanggal Serah Terima -->
+    <div>
+      <label for="tanggalserahterima" class="block text-sm font-medium text-gray-700">Tanggal Serah Terima</label>
+      <input type="date" id="tanggalserahterima" name="tanggalserahterima" class="mt-1 block w-full border rounded p-2 focus:outline-none focus:ring focus:ring-blue-200" required>
+    </div>
+
+    <!-- Buttons -->
+    <div class="flex items-center justify-between mt-6">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Generate PDF</button>
+      <a href="/generate" class="text-blue-600 hover:underline">Kembali</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>
