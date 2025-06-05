@@ -1,0 +1,102 @@
+<%- include('../../partials/header') %>
+
+<div class="max-w-2xl mx-auto bg-white shadow-md rounded-lg p-6 mt-10">
+  <h2 class="text-2xl font-bold text-center text-blue-700 mb-6">Generate Surat Jalan</h2>
+
+  <form action="/generate/pdf/surat-jalan" method="POST" class="space-y-5">
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <div>
+      <label for="nomor" class="block font-medium text-gray-700 mb-1">Nomor Surat</label>
+      <input
+        type="text"
+        id="nomor"
+        name="nomor"
+        required
+        placeholder="Contoh: 015/UNDN/2025"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label for="notelpon" class="block font-medium text-gray-700 mb-1">No Telpon</label>
+      <input
+        type="text"
+        id="notelpon"
+        name="notelpon"
+        required
+        placeholder="Contoh: Jakarta"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="tanggalsurat" class="block font-medium mb-1">Tanggal Surat</label>
+      <input
+        type="date"
+        id="tanggalsurat"
+        name="tanggalsurat"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+    </div>
+     
+
+ 
+    <div>
+      <label for="jeniskendaraan" class="block font-medium text-gray-700 mb-1">Jenis Kendaraan</label>
+      <input
+        type="text"
+        id="kendaraan"
+        name="kendaraan"
+        required
+        placeholder="Contoh: Sedan"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div>
+      <label for="plat" class="block font-medium text-gray-700 mb-1">No Polisi</label>
+      <input
+        type="text"
+        id="plat"
+        name="plat"
+        required
+        placeholder="Contoh: AB 1234 CDE"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+      <div>
+      <label for="driver" class="block font-medium text-gray-700 mb-1">Driver</label>
+      <input
+        type="text"
+        id="driver"
+        name="driver"
+        required
+        placeholder="Contoh: Monkey D. Udin"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    
+
+    
+
+
+    <div class="flex justify-between items-center">
+      <button
+        type="submit"
+        class="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition"
+      >
+        <i class="fa fa-file-pdf-o mr-2"></i> Generate PDF
+      </button>
+      <a
+        href="/generate"
+        class="bg-gray-100 text-gray-700 px-6 py-2 rounded hover:bg-gray-200 transition"
+      >
+        <i class="fa fa-arrow-left mr-2"></i> Kembali
+      </a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

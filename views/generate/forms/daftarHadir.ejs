@@ -1,0 +1,57 @@
+<%- include('../../partials/header') %>
+
+<div class="container mx-auto p-6 max-w-2xl bg-white rounded shadow">
+  <h2 class="text-2xl font-semibold mb-6">Generate Daftar Hadir</h2>
+  <form action="/generate/pdf/daftar-hadir" method="POST" class="space-y-4">
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+ 
+    <div>
+      <label for="hariTanggal" class="block font-medium mb-1">Hari / Tanggal</label>
+      <input type="text" id="hariTanggal" name="hariTanggal" class="w-full border px-4 py-2 rounded" required>
+    </div>
+
+    <div>
+      <label for="waktu" class="block font-medium mb-1">Waktu</label>
+      <input type="text" id="waktu" name="waktu" class="w-full border px-4 py-2 rounded" required placeholder="Contoh: 08.00 WIB - Selesai">
+    </div>
+
+    <div>
+      <label for="tempat" class="block font-medium mb-1">Tempat</label>
+      <input type="text" id="tempat" name="tempat" class="w-full border px-4 py-2 rounded" required>
+    </div>
+
+  
+     <div>
+      <label for="orangtambahan" class="block font-medium text-gray-700 mb-1">Orang Tambahan</label>
+      <input
+        type="text"
+        id="orangtambahan"
+        name="orangtambahan"
+        required
+        placeholder="Contoh: Nurul Mukmin, M. Pd"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <div>
+      <label for="jabatanorang" class="block font-medium text-gray-700 mb-1">Jabatan orang tambahan</label>
+      <input
+        type="text"
+        id="jabatanorang"
+        name="jabatanorang"
+        required
+        placeholder="Ketua Panitia Pengadaan Barang dan Jasa"
+        class="w-full border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+
+    <div class="flex items-center justify-between pt-4">
+      <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded">
+        Generate PDF
+      </button>
+      <a href="/generate" class="text-blue-600 hover:underline">← Kembali</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

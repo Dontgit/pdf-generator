@@ -1,0 +1,79 @@
+<%- include('../../partials/header') %>
+
+<div class="container mx-auto max-w-2xl bg-white p-6 rounded shadow">
+  <h2 class="text-2xl font-bold mb-6">Form Surat Perintah Kerja (SPK)</h2>
+
+  <form action="/generate/pdf/spk" method="POST" class="space-y-5">
+    <!-- invoiceId dikirim dari server -->
+    <input type="hidden" name="invoiceId" value="<%= invoiceId %>">
+
+    <div>
+      <label for="nomor" class="block font-medium mb-1">Nomor SPK</label>
+      <input
+        type="text"
+        id="nomorSPK"
+        name="nomorSPK"
+        required
+        class="w-full border px-4 py-2 rounded"
+        placeholder="Contoh: 001/SPK/VI/2025"
+      />
+    </div>
+     <div>
+      <label for="tanggalSPK" class="block font-medium mb-1">Tanggal SPK</label>
+      <input
+        type="date"
+        id="tanggalSPK"
+        name="tanggalSPK"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+    </div>
+     
+     <div>
+      <label for="waktupelaksana" class="block font-medium mb-1">Tanggal Pelaksana Kegiatan</label>
+      <input
+        type="date"
+        id="waktupelaksana"
+        name="waktupelaksana"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+    </div>
+     
+    
+     <div>
+      <label for="waktupenyelesaian" class="block font-medium mb-1">Tanggal Penyelesaian Kegiatan</label>
+      <input
+        type="date"
+        id="waktupenyelesaian"
+        name="waktupenyelesaian"
+        required
+        class="w-full border px-4 py-2 rounded"
+      />
+    </div>
+
+    <div>
+      <label for="daerah" class="block font-medium mb-1">Tempat (Daerah) Pembuatan</label>
+      <input
+        type="text"
+        id="daerah"
+        name="daerah"
+        required
+        class="w-full border px-4 py-2 rounded"
+        placeholder="Contoh: Jakarta"
+      />
+    </div>
+
+    <div class="flex justify-between items-center pt-4">
+      <button
+        type="submit"
+        class="bg-blue-600 text-white font-semibold px-6 py-2 rounded hover:bg-blue-700"
+      >
+        Generate PDF
+      </button>
+      <a href="/generate" class="text-blue-600 hover:underline">← Kembali</a>
+    </div>
+  </form>
+</div>
+
+<%- include('../../partials/footer') %>

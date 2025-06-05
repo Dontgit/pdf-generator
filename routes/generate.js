@@ -74,6 +74,14 @@ router.post('/pdf/shp', generateController.generateSHP);
 router.post('/pdf/sph', generateController.generateSPH);
 router.post('/pdf/bop', generateController.generateBOPSurat);
 router.post('/pdf/undangan-negosiasi', generateController.generateUndanganNegosiasi);
+router.post('/pdf/daftar-hadir', generateController.generateDaftarHadir);
+router.post('/pdf/persetujuan-negosiasi', generateController.generatePersetujuanNegosiasi);
+router.post('/pdf/surat-kesanggupan', generateController.generateSuratKesanggupanMelaksanakan);
+router.post('/pdf/surat-jalan', generateController.generateSuratJalan);
+router.post('/pdf/surat-serah-terima', generateController.generateSuratSerahTerima);
+router.post('/pdf/spk', generateController.generateSPK);
+router.post('/pdf/faktur', generateController.generateFaktur);
+router.post('/pdf/berita-acara-pemeriksaan', generateController.generateBeritaAcaraPemeriksaan);
 
 
 module.exports = router;
