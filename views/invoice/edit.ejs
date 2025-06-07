@@ -10,18 +10,15 @@
     <label for="Sekolah" class="block font-medium">Sekolah</label>
     <input type="text" name="Sekolah" id="Sekolah" value="<%= invoice.Sekolah %>" class="w-full border rounded px-3 py-2" />
   </div>
-  <div>
-    <label for="Total" class="block font-medium">Total</label>
-    <input type="number" step="0.01" name="Total" id="Total" value="<%= invoice.Total %>" class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="PPN" class="block font-medium">PPN</label>
-    <input type="number" step="0.01" name="PPN" id="PPN" value="<%= invoice.PPN %>" class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="Total_Harga" class="block font-medium">Total Harga</label>
-    <input type="number" step="0.01" name="Total_Harga" id="Total_Harga" value="<%= invoice.Total_Harga %>" class="w-full border rounded px-3 py-2" />
-  </div>
+   <input type="hidden" step="0.01" value="0"  name="Total" id="Total" class="w-full border rounded px-3 py-2" />
+  <input type="hidden" step="0.01" value="0" name="PPN" id="PPN" class="w-full border rounded px-3 py-2" readonly />
+  <input type="hidden" step="0.01" value="0" name="Total_Harga" id="Total_Harga" class="w-full border rounded px-3 py-2" readonly />
+    <input type="hidden" step="0.01" value="0" name="Total_sn" id="Total_sn" class="w-full border rounded px-3 py-2" />
+  
+    <input type="hidden" step="0.01" value="0" name="PPN_sn" id="PPN_sn" class="w-full border rounded px-3 py-2" />
+  
+    <input type="hidden" step="0.01" value="0" name="Total_Harga_sn" id="Total_Harga_sn" class="w-full border rounded px-3 py-2" />
+  
   <div>
     <label for="Costumer_id" class="block font-medium">Costumer</label>
     <select name="Costumer_id" id="Costumer_id" class="w-full border rounded px-3 py-2">

@@ -2,12 +2,12 @@
 
 <div class="flex justify-between items-center mb-4">
   <h1 class="text-2xl font-bold">Detail Invoice List</h1>
-  <a href="/detail_invoice/new" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+  <button id="btnAddNew" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
     <i class="fa fa-plus"></i> Add New
-  </a>
+  </button>
 </div>
 
-<table class="min-w-full bg-white rounded shadow">
+<table class="min-w-full bg-white rounded shadow" id="detailInvoiceTable">
   <thead>
     <tr>
       <th class="py-2 px-4 border-b">ID</th>
@@ -16,7 +16,9 @@
       <th class="py-2 px-4 border-b">Qty</th>
       <th class="py-2 px-4 border-b">Satuan</th>
       <th class="py-2 px-4 border-b">Harga Satuan</th>
+      <th class="py-2 px-4 border-b">Harga Satuan SN</th>
       <th class="py-2 px-4 border-b">Jumlah</th>
+      <th class="py-2 px-4 border-b">Total SN</th>
       <th class="py-2 px-4 border-b">Kondisi</th>
       <th class="py-2 px-4 border-b">Invoice ID</th>
       <th class="py-2 px-4 border-b">Actions</th>
@@ -24,22 +26,24 @@
   </thead>
   <tbody>
     <% details.forEach(detail => { %>
-      <tr>
+      <tr data-id="<%= detail.id %>">
         <td class="py-2 px-4 border-b"><%= detail.id %></td>
         <td class="py-2 px-4 border-b"><%= detail.Nama_Barang %></td>
         <td class="py-2 px-4 border-b"><%= detail.Volume %></td>
         <td class="py-2 px-4 border-b"><%= detail.Qty %></td>
         <td class="py-2 px-4 border-b"><%= detail.Satuan %></td>
         <td class="py-2 px-4 border-b"><%= detail.Harga_Satuan %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Harga_Satuan_sn %></td>
         <td class="py-2 px-4 border-b"><%= detail.Jumlah %></td>
+        <td class="py-2 px-4 border-b"><%= detail.Total_sn %></td>
         <td class="py-2 px-4 border-b"><%= detail.Kondisi %></td>
         <td class="py-2 px-4 border-b"><%= detail.Invoice_id %></td>
         <td class="py-2 px-4 border-b">
-          <a href="/detail_invoice/<%= detail.id %>/edit" class="text-blue-600 hover:underline mr-2">
+          <button class="btnEdit text-blue-600 hover:underline mr-2" title="Edit">
             <i class="fa fa-edit"></i>
-          </a>
+          </button>
           <form action="/detail_invoice/<%= detail.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)">
-            <button type="submit" class="text-red-600 hover:underline">
+            <button type="submit" class="text-red-600 hover:underline" title="Delete">
               <i class="fa fa-trash"></i>
             </button>
           </form>
@@ -48,6 +52,129 @@
     <% }) %>
   </tbody>
 </table>
+
+<!-- Add Modal -->
+<div id="addModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded p-6 w-full max-w-lg relative">
+    <h2 class="text-xl font-bold mb-4">Add New Detail Invoice</h2>
+    <form id="addForm">
+      <div class="space-y-4">
+        <div>
+          <label for="add_Nama_Barang" class="block font-medium">Nama Barang <span class="text-red-600">*</span></label>
+          <input type="text" id="add_Nama_Barang" name="Nama_Barang" required class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Volume" class="block font-medium">Volume</label>
+          <input type="number" step="0.01" id="add_Volume" name="Volume" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Qty" class="block font-medium">Qty</label>
+          <input type="number" id="add_Qty" name="Qty" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Satuan" class="block font-medium">Satuan</label>
+          <input type="text" id="add_Satuan" name="Satuan" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Harga_Satuan" class="block font-medium">Harga Satuan</label>
+          <input type="number" step="0.01" id="add_Harga_Satuan" name="Harga_Satuan" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Harga_Satuan_sn" class="block font-medium">Harga Satuan SN</label>
+          <input type="number" step="0.01" id="add_Harga_Satuan_sn" name="Harga_Satuan_sn" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Jumlah" class="block font-medium">Jumlah</label>
+          <input type="number" step="0.01" id="add_Jumlah" name="Jumlah" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Total_sn" class="block font-medium">Total SN</label>
+          <input type="number" step="0.01" id="add_Total_sn" name="Total_sn" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Kondisi" class="block font-medium">Kondisi</label>
+          <input type="text" id="add_Kondisi" name="Kondisi" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="add_Invoice_id" class="block font-medium">Invoice</label>
+          <select id="add_Invoice_id" name="Invoice_id" class="w-full border rounded px-3 py-2">
+            <option value="">-- Select Invoice --</option>
+            <% invoices.forEach(invoice => { %>
+              <option value="<%= invoice.id %>"><%= invoice.Kegiatan %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button type="button" id="btnAddCancel" class="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100">Cancel</button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+      </div>
+    </form>
+    <button id="btnAddClose" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+  </div>
+</div>
+
+<!-- Edit Modal -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden">
+  <div class="bg-white rounded p-6 w-full max-w-lg relative">
+    <h2 class="text-xl font-bold mb-4">Edit Detail Invoice</h2>
+    <form id="editForm">
+      <input type="hidden" id="edit_id" name="id" />
+      <div class="space-y-4">
+        <div>
+          <label for="edit_Nama_Barang" class="block font-medium">Nama Barang <span class="text-red-600">*</span></label>
+          <input type="text" id="edit_Nama_Barang" name="Nama_Barang" required class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Volume" class="block font-medium">Volume</label>
+          <input type="number" step="0.01" id="edit_Volume" name="Volume" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Qty" class="block font-medium">Qty</label>
+          <input type="number" id="edit_Qty" name="Qty" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Satuan" class="block font-medium">Satuan</label>
+          <input type="text" id="edit_Satuan" name="Satuan" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Harga_Satuan" class="block font-medium">Harga Satuan</label>
+          <input type="number" step="0.01" id="edit_Harga_Satuan" name="Harga_Satuan" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Harga_Satuan_sn" class="block font-medium">Harga Satuan SN</label>
+          <input type="number" step="0.01" id="edit_Harga_Satuan_sn" name="Harga_Satuan_sn" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Jumlah" class="block font-medium">Jumlah</label>
+          <input type="number" step="0.01" id="edit_Jumlah" name="Jumlah" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Total_sn" class="block font-medium">Total SN</label>
+          <input type="number" step="0.01" id="edit_Total_sn" name="Total_sn" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Kondisi" class="block font-medium">Kondisi</label>
+          <input type="text" id="edit_Kondisi" name="Kondisi" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="edit_Invoice_id" class="block font-medium">Invoice</label>
+          <select id="edit_Invoice_id" name="Invoice_id" class="w-full border rounded px-3 py-2">
+            <option value="">-- Select Invoice --</option>
+            <% invoices.forEach(invoice => { %>
+              <option value="<%= invoice.id %>"><%= invoice.Kegiatan %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+      <div class="mt-4 flex justify-end space-x-2">
+        <button type="button" id="btnEditCancel" class="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100">Cancel</button>
+        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Update</button>
+      </div>
+    </form>
+    <button id="btnEditClose" class="absolute top-2 right-2 text-gray-600 hover:text-gray-900 text-xl font-bold">&times;</button>
+  </div>
+</div>
 
 <script>
   function confirmDelete(event) {
@@ -67,4 +194,110 @@
     });
     return false;
   }
+
+  // Modal handling
+  const addModal = document.getElementById('addModal');
+  const editModal = document.getElementById('editModal');
+  const btnAddNew = document.getElementById('btnAddNew');
+  const btnAddClose = document.getElementById('btnAddClose');
+  const btnAddCancel = document.getElementById('btnAddCancel');
+  const btnEditClose = document.getElementById('btnEditClose');
+  const btnEditCancel = document.getElementById('btnEditCancel');
+  const addForm = document.getElementById('addForm');
+  const editForm = document.getElementById('editForm');
+  const detailInvoiceTable = document.getElementById('detailInvoiceTable');
+
+  // Open add modal
+  btnAddNew.addEventListener('click', () => {
+    addForm.reset();
+    addModal.classList.remove('hidden');
+  });
+
+  // Close add modal
+  btnAddClose.addEventListener('click', () => {
+    addModal.classList.add('hidden');
+  });
+  btnAddCancel.addEventListener('click', () => {
+    addModal.classList.add('hidden');
+  });
+
+  // Close edit modal
+  btnEditClose.addEventListener('click', () => {
+    editModal.classList.add('hidden');
+  });
+  btnEditCancel.addEventListener('click', () => {
+    editModal.classList.add('hidden');
+  });
+
+  // Handle edit button clicks
+  detailInvoiceTable.addEventListener('click', (e) => {
+    if (e.target.closest('.btnEdit')) {
+      const tr = e.target.closest('tr');
+      const id = tr.getAttribute('data-id');
+      fetch(`/detail_invoice/api/${id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            document.getElementById('edit_id').value = data.id;
+            document.getElementById('edit_Nama_Barang').value = data.Nama_Barang || '';
+            document.getElementById('edit_Volume').value = data.Volume || '';
+            document.getElementById('edit_Qty').value = data.Qty || '';
+            document.getElementById('edit_Satuan').value = data.Satuan || '';
+            document.getElementById('edit_Harga_Satuan').value = data.Harga_Satuan || '';
+            document.getElementById('edit_Harga_Satuan_sn').value = data.Harga_Satuan_sn || '';
+            document.getElementById('edit_Jumlah').value = data.Jumlah || '';
+            document.getElementById('edit_Total_sn').value = data.Total_sn || '';
+            document.getElementById('edit_Kondisi').value = data.Kondisi || '';
+            document.getElementById('edit_Invoice_id').value = data.Invoice_id || '';
+            editModal.classList.remove('hidden');
+          } else {
+            alert('Failed to load detail invoice data.');
+          }
+        })
+        .catch(() => alert('Failed to load detail invoice data.'));
+    }
+  });
+
+  // Submit add form via AJAX
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const formData = new FormData(addForm);
+    const jsonData = Object.fromEntries(formData.entries());
+    fetch('/detail_invoice/api', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jsonData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.id) {
+        location.reload();
+      } else {
+        alert('Failed to add detail invoice.');
+      }
+    })
+    .catch(() => alert('Failed to add detail invoice.'));
+  });
+
+  // Submit edit form via AJAX
+  editForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const id = document.getElementById('edit_id').value;
+    const formData = new FormData(editForm);
+    const jsonData = Object.fromEntries(formData.entries());
+    fetch(`/detail_invoice/api/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(jsonData)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert('Failed to update detail invoice.');
+      }
+    })
+    .catch(() => alert('Failed to update detail invoice.'));
+  });
 </script>

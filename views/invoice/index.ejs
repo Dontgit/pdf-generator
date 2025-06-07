@@ -17,6 +17,9 @@
       <th class="py-2 px-4 border-b">Total</th>
       <th class="py-2 px-4 border-b">PPN</th>
       <th class="py-2 px-4 border-b">Total Harga</th>
+      <th class="py-2 px-4 border-b">Total Setelah Nego</th>
+      <th class="py-2 px-4 border-b">PPN Setelah Nego</th>
+      <th class="py-2 px-4 border-b">Total Harga Setelah Nego</th>
       <th class="py-2 px-4 border-b">Costumer ID</th>
       <th class="py-2 px-4 border-b">Actions</th>
     </tr>
@@ -30,6 +33,10 @@
         <td class="py-2 px-4 border-b"><%= invoice.Total %></td>
         <td class="py-2 px-4 border-b"><%= invoice.PPN %></td>
         <td class="py-2 px-4 border-b"><%= invoice.Total_Harga %></td>
+                <td class="py-2 px-4 border-b"><%= invoice.Total_sn %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.PPN_sn %></td>
+        <td class="py-2 px-4 border-b"><%= invoice.Total_Harga_sn %></td>
+
         <td class="py-2 px-4 border-b"><%= invoice.Costumer_id %></td>
         <td class="py-2 px-4 border-b">
           <button onclick="openDetailModal(<%= invoice.id %>)" class="text-green-600 hover:underline mr-2" title="View Details">
@@ -67,7 +74,9 @@
             <th class="py-2 px-4 border-b">Qty</th>
             <th class="py-2 px-4 border-b">Satuan</th>
             <th class="py-2 px-4 border-b">Harga Satuan</th>
+            <th class="py-2 px-4 border-b">Harga Satuan SN</th>
             <th class="py-2 px-4 border-b">Jumlah</th>
+            <th class="py-2 px-4 border-b">Total SN</th>
             <th class="py-2 px-4 border-b">Kondisi</th>
             <th class="py-2 px-4 border-b">Actions</th>
           </tr>
@@ -87,22 +96,33 @@
           <input type="text" id="Nama_Barang" class="w-full border rounded px-3 py-2" />
         </div>
         <div>
-  <label for="Volume" class="block font-medium">Volume</label>
-  <input type="number" id="Volume" class="w-full border rounded px-3 py-2" oninput="syncQty()" />
-</div>
-<div>
-  <label for="Qty" class="block font-medium">Qty</label>
-  <input type="number" id="Qty" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
-</div>
-<div>
-  <label for="Harga_Satuan" class="block font-medium">Harga Satuan</label>
-  <input type="number" id="Harga_Satuan" class="w-full border rounded px-3 py-2" oninput="calculateJumlah()" />
-</div>
-<div>
-  <label for="Jumlah" class="block font-medium">Jumlah</label>
-  <input type="number" id="Jumlah" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
-</div>
-
+          <label for="Volume" class="block font-medium">Volume</label>
+          <input type="number" id="Volume" class="w-full border rounded px-3 py-2" oninput="syncQty()" />
+        </div>
+        <div>
+          <label for="Qty" class="block font-medium">Qty</label>
+          <input type="number" id="Qty" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+        </div>
+        <div>
+          <label for="Satuan" class="block font-medium">Satuan</label>
+          <input type="text" id="Satuan" class="w-full border rounded px-3 py-2" />
+        </div>
+        <div>
+          <label for="Harga_Satuan" class="block font-medium">Harga Satuan</label>
+          <input type="number" id="Harga_Satuan" class="w-full border rounded px-3 py-2" oninput="calculateJumlah()" />
+        </div>
+        <div>
+          <label for="Jumlah" class="block font-medium">Jumlah</label>
+          <input type="number" id="Jumlah" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+        </div>
+        <div>
+          <label for="Harga_Satuan_sn" class="block font-medium">Harga Satuan Setelah Nego</label>
+          <input type="number" id="Harga_Satuan_sn" class="w-full border rounded px-3 py-2" oninput="calculateJumlahNego()" />
+        </div>
+        <div>
+          <label for="Jumlah_sn" class="block font-medium">Jumlah Setelah Nego</label>
+          <input type="number" id="Jumlah_sn" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+        </div>
         <div>
           <label for="Kondisi" class="block font-medium">Kondisi</label>
           <input type="text" id="Kondisi" class="w-full border rounded px-3 py-2" />
@@ -181,7 +201,9 @@ function populateDetailInvoiceTable(details) {
       <td class="py-2 px-4 border-b">${detail.Qty || ''}</td>
       <td class="py-2 px-4 border-b">${detail.Satuan || ''}</td>
       <td class="py-2 px-4 border-b">${detail.Harga_Satuan || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Harga_Satuan_sn || ''}</td>
       <td class="py-2 px-4 border-b">${detail.Jumlah || ''}</td>
+      <td class="py-2 px-4 border-b">${detail.Jumlah_sn || ''}</td>
       <td class="py-2 px-4 border-b">${detail.Kondisi || ''}</td>
       <td class="py-2 px-4 border-b text-center">
         <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:underline mr-2">
@@ -220,6 +242,8 @@ function populateDetailInvoiceTable(details) {
     document.getElementById('Satuan').value = '';
     document.getElementById('Harga_Satuan').value = '';
     document.getElementById('Jumlah').value = '';
+    document.getElementById('Harga_Satuan_sn').value = '';
+    document.getElementById('Jumlah_sn').value = '';
     document.getElementById('Kondisi').value = '';
   }
 
@@ -233,6 +257,8 @@ function populateDetailInvoiceTable(details) {
       Satuan: document.getElementById('Satuan').value,
       Harga_Satuan: parseFloat(document.getElementById('Harga_Satuan').value),
       Jumlah: parseFloat(document.getElementById('Jumlah').value),
+      Harga_Satuan_sn: parseFloat(document.getElementById('Harga_Satuan_sn').value),
+      Jumlah_sn: parseFloat(document.getElementById('Jumlah_sn').value),
       Kondisi: document.getElementById('Kondisi').value,
       Invoice_id: invoiceId
     };
@@ -289,13 +315,25 @@ function calculateJumlah() {
     document.getElementById('Jumlah').value = '';
   }
 }
+function calculateJumlahNego() {
+  const qty = parseFloat(document.getElementById('Qty').value);
+  const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan_sn').value);
+  if (!isNaN(qty) && !isNaN(hargaSatuan)) {
+    document.getElementById('Jumlah_sn').value = qty * hargaSatuan;
+  } else {
+    document.getElementById('Jumlah_sn').value = '';
+  }
+}
+
 
   function editDetail(id) {
     fetch(`/detail_invoice/api/${currentInvoiceId}`)
       .then(response => response.json())
       .then(details => {
         const detail = details.find(d => d.id === id);
+        console.log(detail);
         if (detail) {
+          showAddDetailForm();
           document.getElementById('detailInvoiceId').value = detail.id;
           document.getElementById('detailInvoiceInvoiceId').value = detail.Invoice_id;
           document.getElementById('Nama_Barang').value = detail.Nama_Barang;
@@ -304,8 +342,9 @@ function calculateJumlah() {
           document.getElementById('Satuan').value = detail.Satuan;
           document.getElementById('Harga_Satuan').value = detail.Harga_Satuan;
           document.getElementById('Jumlah').value = detail.Jumlah;
+          document.getElementById('Harga_Satuan_sn').value = detail.Harga_Satuan_sn;
+          document.getElementById('Jumlah_sn').value = detail.Jumlah_sn;
           document.getElementById('Kondisi').value = detail.Kondisi;
-          showAddDetailForm();
         }
       })
       .catch(error => {
