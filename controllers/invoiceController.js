@@ -16,15 +16,68 @@ exports.new = async (req, res) => {
 };
 
 exports.create = async (req, res) => {
-  const { Kegiatan, Sekolah, Costumer_id, Total_sn = 0, PPN_sn = 0, Total_Harga_sn = 0 } = req.body;
+  // Melakukan dekonstruksi body dari request dan memberikan nilai default untuk menghindari undefined
+  const { 
+    Kegiatan, 
+    Sekolah, 
+    Costumer_id, 
+    Total_sn = 0, 
+    PPN_sn = 0, 
+    Total_Harga_sn = 0 
+  } = req.body;
+
+  // Mendapatkan koneksi dari pool untuk memulai transaksi
+  let connection;
   try {
-    await pool.query(
+    connection = await pool.getConnection();
+    
+    // Memulai transaksi
+    await connection.beginTransaction();
+
+    // Query pertama: Menyisipkan data ke dalam tabel Invoice
+    // Menggunakan [results] untuk mendapatkan hasil query dari mysql2/mysql
+    const [invoiceResult] = await connection.query(
       'INSERT INTO Invoice (Kegiatan, Sekolah, Total, PPN, Total_Harga, Costumer_id, Total_sn, PPN_sn, Total_Harga_sn) VALUES (?, ?, 0, 0, 0, ?, ?, ?, ?)',
       [Kegiatan, Sekolah, Costumer_id, Total_sn, PPN_sn, Total_Harga_sn]
     );
+
+    // Mengambil ID dari invoice yang baru saja dibuat
+    const newInvoiceId = invoiceResult.insertId;
+    
+    // Memeriksa apakah insertId berhasil didapatkan
+    if (!newInvoiceId) {
+        throw new Error("Gagal membuat invoice, tidak ada ID yang dikembalikan.");
+    }
+
+    // Query kedua: Menyisipkan ID invoice ke dalam tabel pdf
+    await connection.query(
+      'INSERT INTO pdf (invoice_id) VALUES (?)',
+      [newInvoiceId]
+    );
+
+    // Jika semua query berhasil, commit transaksi
+    await connection.commit();
+
+    // Mengalihkan pengguna ke halaman invoice setelah berhasil
     res.redirect('/invoice');
+
   } catch (err) {
-    res.status(500).send(err.message);
+    // Jika terjadi error, rollback semua perubahan dalam transaksi
+    if (connection) {
+      await connection.rollback();
+    }
+    
+    // Mencatat error ke konsol untuk debugging
+    console.error("Error saat membuat invoice:", err);
+    
+    // Mengirim response error ke client
+    res.status(500).send("Terjadi kesalahan pada server: " + err.message);
+
+  } finally {
+    // Selalu lepaskan koneksi kembali ke pool setelah selesai
+    if (connection) {
+      connection.release();
+    }
   }
 };
 

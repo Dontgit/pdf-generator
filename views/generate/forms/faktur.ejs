@@ -1,7 +1,7 @@
 <%- include('../../partials/header') %>
 
 <div class="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10">
-  <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Generate Surat Jalan (Faktur)</h2>
+  <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Generate Faktur</h2>
 
   <form action="/generate/pdf/faktur" method="POST" class="space-y-5">
     <input type="hidden" name="invoiceId" value="<%= invoiceId %>">

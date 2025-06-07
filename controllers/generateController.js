@@ -488,8 +488,8 @@ exports.generateBOPSurat = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-BOP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/BOP', fileName);
+      const fileName = `pdf/BOP/${invoice.id}-BOP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -499,8 +499,16 @@ exports.generateBOPSurat = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET BOP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -641,8 +649,8 @@ exports.generateSHP = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SHP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SHP', fileName);
+     const fileName = `pdf/SHP/${invoice.id}-SHP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -652,9 +660,16 @@ exports.generateSHP = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
-      res.download(filePath, fileName);
+     try {
+      await pool.query(
+        'UPDATE pdf SET SHP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
       
+      res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
     }else{
     const buffer = Buffer.from(pdfBytes);
   
@@ -812,8 +827,8 @@ exports.generateSPH = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SPH.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SPH', fileName);
+     const fileName = `pdf/SPH/${invoice.id}-SPH.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -823,8 +838,16 @@ exports.generateSPH = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SPH = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -968,8 +991,8 @@ exports.generateDaftarHadir = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-DH.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/DH', fileName);
+    const fileName = `pdf/DH/${invoice.id}-DH.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -979,8 +1002,16 @@ exports.generateDaftarHadir = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET DH = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -1163,8 +1194,8 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
 
     
     if(download){
-      const fileName = `${invoice.id}-PHN.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/PHN', fileName);
+      const fileName = `pdf/PHN/${invoice.id}-PHN.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -1174,8 +1205,16 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET PHN = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -1379,8 +1418,8 @@ exports.generateSPK = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SPK.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SPK', fileName);
+      const fileName = `pdf/SPK/${invoice.id}-SPK.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -1390,8 +1429,16 @@ exports.generateSPK = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SPK = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -1536,8 +1583,8 @@ exports.generateUndanganNegosiasi = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-UN.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/UN', fileName);
+      const fileName = `pdf/UN/${invoice.id}-UN.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -1547,8 +1594,16 @@ exports.generateUndanganNegosiasi = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET UN = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -1706,8 +1761,8 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SKM.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SKM', fileName);
+      const fileName = `pdf/SKM/${invoice.id}-SKM.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -1717,8 +1772,16 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SKM = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -1795,6 +1858,25 @@ exports.generateSuratJalan = async (req, res) => {
       thickness: 1,
       color: rgb(0, 0, 0),
     });
+     function drawDetailWrapped(label, value, y) {
+      const labelX = startX ;
+      const colonX = startX + 100;
+      const valueX = startX + 120;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - (fontSize + 4) - 5;
+    }
+    startY-= 20;
+    yPosition  = startY;
 
 
     // Letter header details
@@ -1812,7 +1894,7 @@ exports.generateSuratJalan = async (req, res) => {
     startY -= 15;
     drawLabelColonValue('Nama', costumer.Sekolah || '', startY,startX);
     startY -= 15;
-    drawLabelColonValue('Alamat', costumer.Alamat || '', startY,startX);
+    startY = drawDetailWrapped('Alamat', costumer.Alamat, startY);
     startY -= 15;
     drawLabelColonValue('No.Telpon', notelpon || '', startY,startX);
     startY -= 20;
@@ -1867,8 +1949,8 @@ exports.generateSuratJalan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SJ.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SJ', fileName);
+      const fileName = `pdf/SJ/${invoice.id}-SJ.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -1878,8 +1960,16 @@ exports.generateSuratJalan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SJ = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -2004,8 +2094,8 @@ exports.generateSuratSerahTerima = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SST.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SST', fileName);
+      const fileName = `pdf/SST/${invoice.id}-SST.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -2015,8 +2105,16 @@ exports.generateSuratSerahTerima = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SST = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -2205,7 +2303,7 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
     // Main content
     const mainContent = `PIHAK PERTAMA telah menyerahkan kepada PIHAK KEDUA, barang pesanan Pejabat Pelaksana Teknis Kegiatan ${costumer.Sekolah} berupa belanja ${invoice.Kegiatan} yang dipesan untuk ${costumer.Sekolah} dalam keadaan baik dan jumlah cukup.`;
     yPosition = drawParagraphJustify(page, mainContent.trim(), startX, yPosition, 450, 18, fontRegular, fontSize,'');
-    const mainContent2 = `Bahwa PIHAK KEDUA telah menerima dari PIHAK PERTAMA barang pesanan tersebut seluruhnya dengan baik dan lengkap, maka PIHAK PERTAMA berhak menerima pembayaran sebesar Rp. ${invoice.Total_Harga} ,- (${terbilangManual(invoice.Total_Harga)}).`;
+    const mainContent2 = `Bahwa PIHAK KEDUA telah menerima dari PIHAK PERTAMA barang pesanan tersebut seluruhnya dengan baik dan lengkap, maka PIHAK PERTAMA berhak menerima pembayaran sebesar Rp. ${invoice.Total_Harga_sn} ,- (${terbilangManual(invoice.Total_Harga_sn)}).`;
     yPosition = drawParagraphJustify(page, mainContent2.trim(), startX, yPosition, 450, 18, fontRegular, fontSize,'');
     yPosition -= 20;
     
@@ -2233,8 +2331,8 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-BAP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/BAP', fileName);
+      const fileName = `pdf/BAP/${invoice.id}-BAP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -2244,8 +2342,16 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET BAP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -2345,11 +2451,11 @@ exports.generateFaktur = async (req, res) => {
     // Define columns & rows for tabel
     const columns = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Nama Barang', key: 'namabarang', width: 160 },
       { header: 'Volume', key: 'volume', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
       { header: 'Harga Satuan', key: 'harga', width: 80 },
-      { header: 'Jumlah', key: 'jumlah', width: 60 },
+      { header: 'Jumlah', key: 'jumlah', width: 80 },
     ];
 
     const rows = detail_invoice.map((item, idx) => ({
@@ -2357,14 +2463,14 @@ exports.generateFaktur = async (req, res) => {
       namabarang: item.Nama_Barang || '',
       volume: item.Volume ? item.Volume.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
-      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
-      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+      harga: item.Harga_Satuan_sn ? formatRupiah(item.Harga_Satuan_sn) : '',
+      jumlah: item.Jumlah_sn ? formatRupiah(item.Jumlah_sn) : '',
     }));  
     
     const summaryRows = [
-      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
-      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
-      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+      { label: 'Jumlah', value: formatRupiah(invoice.Total_sn) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN_sn) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga_sn) },
     ];
     // Draw table with summary
     startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
@@ -2380,7 +2486,7 @@ exports.generateFaktur = async (req, res) => {
         startY -= 40;
 
     // Left signature
-    page.drawText(`${daerah} ${tanggalFormatted}`, { x: startX, y: startY, size: fontSize, font: fontRegular });
+    page.drawText(`${daerah}, ${tanggalFormatted}`, { x: startX, y: startY, size: fontSize, font: fontRegular });
     page.drawText(PT, { x: startX, y: startY - 15, size: fontSize, font: fontRegular });
     page.drawText(JabatanPT, { x: startX, y: startY - 100, size: fontSize, font: fontBold });
     page.drawText(Direktur, { x: startX, y: startY - 115, size: fontSize, font: fontRegular });
@@ -2389,8 +2495,8 @@ exports.generateFaktur = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-Faktur.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/Faktur', fileName);
+     const fileName = `pdf/Faktur/${invoice.id}-FAKTUR.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -2400,8 +2506,16 @@ exports.generateFaktur = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET FAKTUR = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -2585,8 +2699,8 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
   // Table
     const columns2 = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Kegiatan', key: 'kegiatan', width: 60 },
-      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Kegiatan', key: 'kegiatan', width: 120 },
+      { header: 'Nama Barang', key: 'namabarang', width: 150 },
       { header: 'Spesifikasi', key: 'Spesifikasi', width: 80 },
       { header: 'Qty', key: 'Qty', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
@@ -2596,7 +2710,7 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
     const rows2 = detail_invoice.map((item, idx) => ({
       no: (idx + 1).toString(),
       namabarang: item.Nama_Barang || '',
-      kegiatan: item.Kegiatan ? item.Kegiatan.toString() : '',
+      kegiatan: invoice.Kegiatan ? invoice.Kegiatan : '',
       Spesifikasi: "" ,
       Qty: item.Qty ? item.Qty.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
@@ -2627,8 +2741,8 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-BAPe.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/BAPe', fileName);
+      const fileName = `pdf/BAPe/${invoice.id}-BAPe.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -2638,9 +2752,16 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
-      res.download(filePath, fileName);
+     try {
+      await pool.query(
+        'UPDATE pdf SET BAPe = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
       
+      res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
     }else{
     const buffer = Buffer.from(pdfBytes);
 
@@ -2818,8 +2939,8 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
   // Table
     const columns2 = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Kegiatan', key: 'kegiatan', width: 60 },
-      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Kegiatan', key: 'kegiatan', width: 120 },
+      { header: 'Nama Barang', key: 'namabarang', width: 150 },
       { header: 'Spesifikasi', key: 'Spesifikasi', width: 80 },
       { header: 'Qty', key: 'Qty', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
@@ -2829,7 +2950,7 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
     const rows2 = detail_invoice.map((item, idx) => ({
       no: (idx + 1).toString(),
       namabarang: item.Nama_Barang || '',
-      kegiatan: item.Kegiatan ? item.Kegiatan.toString() : '',
+      kegiatan: invoice.Kegiatan ? invoice.Kegiatan : '',
       Spesifikasi: "" ,
       Qty: item.Qty ? item.Qty.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
@@ -2855,8 +2976,8 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-BAST.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/BAST', fileName);
+     const fileName = `pdf/BAST/${invoice.id}-BAST.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -2866,9 +2987,16 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
-      res.download(filePath, fileName);
+     try {
+      await pool.query(
+        'UPDATE pdf SET BAST = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
       
+      res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
     }else{
     const buffer = Buffer.from(pdfBytes);
 
@@ -2987,7 +3115,7 @@ function drawDetailWrapped(label, value, y) {
 
 
     
-    yPosition = drawDetailWrapped('Jumlah', `Rp ${invoice.Total_Harga}`, yPosition);
+    yPosition = drawDetailWrapped('Jumlah', `Rp ${formatRupiah(invoice.Total_Harga)}`, yPosition);
     
        // Left signature (PIHAK KEDUA)
        startX += 280;
@@ -2999,8 +3127,8 @@ function drawDetailWrapped(label, value, y) {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-Kwitansi.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/Kwitansi', fileName);
+     const fileName = `pdf/Kwitansi/${invoice.id}-Kwitansi.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3010,8 +3138,16 @@ function drawDetailWrapped(label, value, y) {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET KWITANSI = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -3168,8 +3304,8 @@ exports.generateDokumenPerencanaan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-DP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/DP', fileName);
+      const fileName = `pdf/DP/${invoice.id}-DP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3179,8 +3315,16 @@ exports.generateDokumenPerencanaan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET DP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -3277,7 +3421,7 @@ exports.generateHPS = async (req, res) => {
     yPosition = drawDetailWrapped('Organisasi/SKPD', costumer.Sekolah, yPosition);
     yPosition = drawDetailWrapped('Rincian Kegiatan', invoice.Kegiatan, yPosition);
     yPosition = drawDetailWrapped('Tahun Anggaran', `${tahun}`, yPosition);
-    console.log(tahun);
+   
          yPosition -= 30;
 
 
@@ -3285,11 +3429,11 @@ exports.generateHPS = async (req, res) => {
     startY = yPosition + 8;
     const columns = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Nama Barang', key: 'namabarang', width: 200 },
+      { header: 'Nama Barang', key: 'namabarang', width: 180 },
       { header: 'Volume', key: 'volume', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
       { header: 'Harga Satuan', key: 'harga', width: 80 },
-      { header: 'Jumlah', key: 'jumlah', width: 60 },
+      { header: 'Jumlah', key: 'jumlah', width: 80 },
     ];
 
     const rows = detail_invoice.map((item, idx) => ({
@@ -3297,14 +3441,14 @@ exports.generateHPS = async (req, res) => {
       namabarang: item.Nama_Barang || '',
       volume: item.Volume ? item.Volume.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
-      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
-      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+      harga: item.Harga_Satuan_sn ? formatRupiah(item.Harga_Satuan_sn) : '',
+      jumlah: item.Jumlah_sn ? formatRupiah(item.Jumlah_sn) : '',
     }));
 
     const summaryRows = [
-      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
-      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
-      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+      { label: 'Jumlah', value: formatRupiah(invoice.Total_sn) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN_sn) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga_sn) },
     ];
 
     startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
@@ -3321,8 +3465,8 @@ exports.generateHPS = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
 
     if(download){
-      const fileName = `${invoice.id}-HPS.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/HPS', fileName);
+     const fileName = `pdf/HPS/${invoice.id}-HPS.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3332,8 +3476,16 @@ exports.generateHPS = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET HPS = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
 
@@ -3454,8 +3606,8 @@ exports.generateDokumenHasilPerbandingan = async (req, res) => {
       },
       {
         label: 'Nama Produk',
-        produk1: costumer.Kegiatan,
-        produk2: costumer.Kegiatan,
+        produk1: invoice.Kegiatan,
+        produk2: invoice.Kegiatan,
         dst: '……………',
       },
       {
@@ -3504,8 +3656,8 @@ exports.generateDokumenHasilPerbandingan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-DHP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/DHP', fileName);
+    const fileName = `pdf/DHP/${invoice.id}-DHP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3515,8 +3667,16 @@ exports.generateDokumenHasilPerbandingan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET DHP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -3592,12 +3752,12 @@ exports.generateDokumenHasilNegosiasi = async (req, res) => {
       color: rgb(0, 0, 0),
     });
      startY -= 15;
-    drawLabelColonValue('Nomor', nomor || '', startY,centerX + titleWidth / 3, 35, 40);
+
 
     function drawDetailWrapped(label, value, y) {
       const labelX = startX + 20;
-      const colonX = startX + 150;
-      const valueX = startX + 170;
+      const colonX = startX + 180;
+      const valueX = startX + 190;
       const maxWidth = 350;
 
       page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
@@ -3616,8 +3776,8 @@ exports.generateDokumenHasilNegosiasi = async (req, res) => {
     yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition);
     yPosition = drawDetailWrapped('Alamat Satuan Pendidikan', costumer.Alamat, yPosition);
     yPosition = drawDetailWrapped('Nama Calon Penyedia', PT, yPosition);
-    yPosition = drawDetailWrapped('Tanggal Terima Barang/ Jasa', tanggalterima, yPosition);
-    yPosition = drawDetailWrapped('Hasil Negosiasi', invoice.Total_Harga, yPosition);
+    yPosition = drawDetailWrapped('Tanggal Terima Barang/ Jasa', ` ${formatTanggalIndonesia(tanggalterima)}`, yPosition);
+    yPosition = drawDetailWrapped('Hasil Negosiasi', `Rp ${formatRupiah( invoice.Total_Harga_sn)}`, yPosition);
     yPosition -= 30;
 
     startY = yPosition;
@@ -3638,8 +3798,8 @@ exports.generateDokumenHasilNegosiasi = async (req, res) => {
       no: (idx + 1).toString(),
       namabarang: item.Nama_Barang || '',
       qty: item.Qty ? item.Qty.toString() : '',
-      hargapenawaran: item.Harga_Satuan ? item.Harga_Satuan.toString() : '',
-      harganegosiasi: item.Harga_Satuan ? item.Harga_Satuan.toString() : '',
+      hargapenawaran: item.Harga_Satuan ?   `Rp ${formatRupiah(item.Harga_Satuan.toString())}` : '',
+      harganegosiasi: item.Harga_Satuan_sn ? `Rp ${formatRupiah(item.Harga_Satuan_sn.toString()) }` : '',
       keterangan: "" ,
     }));
     startY = drawTable(page, startX, startY, columns, rows,  fontRegular, fontSize);
@@ -3657,8 +3817,8 @@ exports.generateDokumenHasilNegosiasi = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-DHN.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/DHN', fileName);
+    const fileName = `pdf/DHN/${invoice.id}-DHN.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3668,8 +3828,16 @@ exports.generateDokumenHasilNegosiasi = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET DHN = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -3846,8 +4014,8 @@ exports.generateSHPP = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-SHPP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/SHPP', fileName);
+      const fileName = `pdf/SHPP/${invoice.id}-SHPP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -3857,8 +4025,16 @@ exports.generateSHPP = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET SHPP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);
@@ -4059,8 +4235,8 @@ exports.generateBeritaAcaraSerahTerimaPekerjaan = async (req, res) => {
     const pdfBytes = await pdfDoc.save();
     
     if(download){
-      const fileName = `${invoice.id}-BASTP.pdf`;
-      const filePath = path.join(__dirname, '../public/pdf/BASTP', fileName);
+      const fileName = `pdf/BASTP/${invoice.id}-BASTP.pdf`;
+      const filePath = path.join(__dirname, '../public/', fileName);
       
       // Hapus file lama jika ada
       if (fs.existsSync(filePath)) {
@@ -4070,8 +4246,16 @@ exports.generateBeritaAcaraSerahTerimaPekerjaan = async (req, res) => {
       // Tulis file baru
       fs.writeFileSync(filePath, pdfBytes);
       
-      // Kirim ke browser
+     try {
+      await pool.query(
+        'UPDATE pdf SET BASTP = ? WHERE invoice_id = ?',
+        [fileName,invoice.id]
+      );
+      
       res.download(filePath, fileName);
+    } catch (err) {
+      res.status(500).send(err.message);
+    }
       
     }else{
     const buffer = Buffer.from(pdfBytes);

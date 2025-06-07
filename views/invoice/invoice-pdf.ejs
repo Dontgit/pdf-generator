@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Menggunakan title dinamis yang dikirim dari route, atau default -->
+    <title><%= typeof title !== 'undefined' ? title : 'Daftar Dokumen Invoice' %></title>
+    <!-- Memuat Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Font Awesome untuk ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 md:p-8">
+            <div class="border-b border-gray-200 pb-4 mb-6">
+                <!-- Header halaman -->
+                <h1 class="text-3xl font-bold text-gray-900">Dokumen Invoice</h1>
+                <!-- Menampilkan ID invoice jika tersedia -->
+                <% if (invoice && invoice.id) { %>
+                    <p class="text-md text-gray-500 mt-1">
+                        Untuk Invoice ID: #<%= invoice.id %> - <%= invoice.Kegiatan %>
+                    </p>
+                <% } %>
+            </div>
+
+            <div id="document-list">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">File yang Tersedia:</h2>
+                
+                <% 
+                let documentsFound = false;
+                // Memeriksa apakah data PDF ada dan bukan objek kosong
+                if (pdfData && Object.keys(pdfData).length) {
+                    // Membuat container untuk tombol-tombol
+                %>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <%
+                    // Melakukan iterasi pada setiap key-value pair dalam objek pdfData
+                    for (const [key, path] of Object.entries(pdfData)) {
+                        // Lewati field 'id' dan 'invoice_id', dan hanya proses field yang memiliki path (bukan null/kosong)
+                        if (key !== 'id' && key !== 'invoice_id' && typeof path === 'string' && path.trim() !== '') {
+                            documentsFound = true;
+                %>
+                        <!-- Setiap tombol adalah sebuah link yang membuka di tab baru -->
+                        <a href="/<%= path %>" target="_blank" rel="noopener noreferrer" class="group flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+                            <div class="flex items-center space-x-3">
+                                <i class="fa-regular fa-file-pdf text-red-500 fa-lg"></i>
+                                <span class="font-semibold text-gray-700 group-hover:text-blue-700"><%= key %></span>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-gray-400 group-hover:text-blue-600 transition-transform duration-200 transform group-hover:scale-110"></i>
+                        </a>
+                <%
+                        }
+                    }
+                %>
+                </div>
+                <%
+                }
+                // Jika setelah iterasi tidak ada dokumen yang ditemukan
+                if (!documentsFound) {
+                %>
+                    <div class="text-center py-10 px-4 bg-gray-50 rounded-lg">
+                        <i class="fa-solid fa-folder-open fa-2x text-gray-400 mb-3"></i>
+                        <p class="text-gray-500">Tidak ada file dokumen yang terlampir untuk invoice ini.</p>
+                    </div>
+                <%
+                }
+                %>
+            </div>
+             <div class="mt-8 pt-6 border-t border-gray-200 text-center">
+                <a href="/invoice" class="text-blue-600 hover:underline">
+                    <i class="fa fa-arrow-left mr-2"></i>Kembali ke Daftar Invoice
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

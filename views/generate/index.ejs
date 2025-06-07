@@ -1,43 +1,123 @@
 <%- include('../partials/header') %>
 
-<h1 class="text-3xl font-extrabold mb-8 text-gray-900">Generate Dokumen</h1>
+<!-- 
+  Desain Halaman Generate Dokumen yang Telah Diperbarui.
+  Menggunakan pendekatan langkah-demi-langkah untuk pengalaman pengguna yang lebih baik
+  dan layout kartu untuk visual yang lebih menarik.
+-->
+<div class="max-w-5xl mx-auto">
+  <!-- Header Halaman -->
+  <div class="border-b border-gray-200 pb-4 mb-8">
+    <h1 class="text-4xl font-extrabold text-gray-900">Generate Dokumen</h1>
+    <p class="mt-2 text-lg text-gray-600">Buat dokumen yang diperlukan untuk invoice Anda dalam dua langkah mudah.</p>
+  </div>
 
-<div class="mb-8 max-w-md">
-  <label for="invoiceSelect" class="block mb-3 font-semibold text-gray-700">Pilih Invoice:</label>
-  <select id="invoiceSelect" required class="w-full px-4 py-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
-    <option value="">-- Pilih Invoice --</option>
-    <% invoices.forEach(inv => { %>
-      <option value="<%= inv.id %>"><%= inv.Kegiatan %></option>
-    <% }) %>
-  </select>
+  <div class="space-y-8">
+    <!-- Langkah 1: Pilih Invoice -->
+    <div class="bg-white p-6 rounded-xl shadow-md border border-gray-200">
+      <div class="flex items-center gap-4">
+        <div class="flex-shrink-0 bg-blue-600 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-lg">1</div>
+        <h2 class="text-2xl font-semibold text-gray-800">Pilih Invoice</h2>
+      </div>
+      <p class="mt-2 ml-14 text-gray-500">Pilih invoice yang akan dijadikan dasar untuk pembuatan dokumen.</p>
+      <div class="mt-5 ml-14">
+        <select id="invoiceSelect" required class="w-full max-w-lg px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition">
+          <option value="">-- Silakan Pilih Invoice --</option>
+          <% if (invoices && invoices.length) { %>
+            <% invoices.forEach(inv => { %>
+              <option value="<%= inv.id %>"><%= inv.Kegiatan %> (ID: <%= inv.id %>)</option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+    </div>
+
+    <!-- Langkah 2: Pilih Jenis Dokumen (Awalnya Tersembunyi) -->
+    <div id="generate-section" class="bg-white p-6 rounded-xl shadow-md border border-gray-200 opacity-50 transition-opacity duration-500">
+      <div class="flex items-center gap-4">
+        <div id="step2-indicator" class="flex-shrink-0 bg-gray-400 text-white rounded-full h-10 w-10 flex items-center justify-center font-bold text-lg transition-colors">2</div>
+        <h2 class="text-2xl font-semibold text-gray-800">Pilih Jenis Dokumen</h2>
+      </div>
+       <p id="generate-prompt" class="mt-2 ml-14 text-gray-500">Pilih invoice pada Langkah 1 untuk melanjutkan.</p>
+
+      <!-- Grid untuk Tombol Generate -->
+      <div id="generate-grid" class="mt-5 ml-14 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 pointer-events-none">
+        <% if (generateMenus && generateMenus.length) { %>
+          <% generateMenus.forEach(menu => { %>
+            <button
+              class="generate-btn group flex flex-col items-center justify-center text-center p-4 bg-gray-50 border rounded-lg shadow-sm hover:shadow-lg hover:border-blue-500 hover:-translate-y-1 transition-all duration-300"
+              data-key="<%= menu.key %>"
+              type="button"
+              aria-label="Generate <%= menu.label %>"
+              disabled
+            >
+              <div class="mb-3 text-3xl text-gray-400 group-hover:text-blue-600 transition-colors">
+                 <i class="fa-solid fa-file-invoice"></i>
+              </div>
+              <span class="font-semibold text-gray-700 group-hover:text-blue-800"><%= menu.label %></span>
+            </button>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+  </div>
 </div>
 
-<h2 class="text-2xl font-semibold mb-6 text-gray-800">Pilih Jenis Generate:</h2>
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-5xl">
-  <% generateMenus.forEach(menu => { %>
-    <button
-      class="generate-btn bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition flex items-center justify-center gap-2"
-      data-key="<%= menu.key %>"
-      type="button"
-      aria-label="Generate <%= menu.label %>"
-    >
-      <i class="fa fa-file-alt"></i>
-      <%= menu.label %>
-    </button>
-  <% }) %>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
 <script>
-  document.querySelectorAll('.generate-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const invoiceId = document.getElementById('invoiceSelect').value;
-      if (!invoiceId) {
-        alert('Silakan pilih invoice terlebih dahulu!');
-        return;
+  document.addEventListener('DOMContentLoaded', () => {
+    const invoiceSelect = document.getElementById('invoiceSelect');
+    const generateSection = document.getElementById('generate-section');
+    const generateGrid = document.getElementById('generate-grid');
+    const step2Indicator = document.getElementById('step2-indicator');
+    const generatePrompt = document.getElementById('generate-prompt');
+    const generateButtons = document.querySelectorAll('.generate-btn');
+
+    // Fungsi untuk mengaktifkan Langkah 2
+    function activateStep2() {
+        generateSection.classList.remove('opacity-50');
+        generateGrid.classList.remove('pointer-events-none');
+        step2Indicator.classList.remove('bg-gray-400');
+        step2Indicator.classList.add('bg-blue-600');
+        generatePrompt.textContent = 'Sekarang, pilih dokumen yang ingin Anda buat.';
+        generateButtons.forEach(btn => btn.disabled = false);
+    }
+
+    // Fungsi untuk menonaktifkan Langkah 2
+    function deactivateStep2() {
+        generateSection.classList.add('opacity-50');
+        generateGrid.classList.add('pointer-events-none');
+        step2Indicator.classList.add('bg-gray-400');
+        step2Indicator.classList.remove('bg-blue-600');
+        generatePrompt.textContent = 'Pilih invoice pada Langkah 1 untuk melanjutkan.';
+        generateButtons.forEach(btn => btn.disabled = true);
+    }
+
+    // Event listener untuk dropdown
+    invoiceSelect.addEventListener('change', () => {
+      if (invoiceSelect.value) {
+        activateStep2();
+      } else {
+        deactivateStep2();
       }
-      const key = btn.getAttribute('data-key');
-      window.location.href = `/generate/${key}?invoiceId=${invoiceId}`;
+    });
+
+    // Event listener untuk tombol generate
+    generateButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const invoiceId = invoiceSelect.value;
+        // Tombol sudah disabled, jadi pengecekan ini hanya sebagai pengaman tambahan
+        if (!invoiceId) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Silakan pilih invoice terlebih dahulu!',
+          });
+          return;
+        }
+        const key = btn.getAttribute('data-key');
+        // Arahkan ke URL generate
+        window.location.href = `/generate/${key}?invoiceId=${invoiceId}`;
+      });
     });
   });
 </script>
