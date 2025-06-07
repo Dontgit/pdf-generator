@@ -10,27 +10,22 @@
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
       <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kop Surat</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIP</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alamat</th>
         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
       <% costumers.forEach(costumer => { %>
         <tr>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.id %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.kop_surat %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Jabatan %></td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Nama %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.NIP %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Jabatan %></td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Sekolah %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Alamat %></td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
+            <a href="/costumer/<%= costumer.id %>/detail" class="text-green-600 hover:text-green-900" title="View Details">
+              <i class="fa fa-info-circle"></i>
+            </a>
             <a href="/costumer/<%= costumer.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit">
               <i class="fa fa-edit"></i>
             </a>

@@ -24,10 +24,13 @@ router.get('/', costumerController.index);
 router.get('/new', costumerController.new);
 
 // Create new costumer with file upload
-router.post('/', upload.single('kop_surat'), costumerController.create);
 
+router.post('/', upload.single('kop_surat'), costumerController.create);
 // Show form to edit costumer
 router.get('/:id/edit', costumerController.edit);
+
+// Show detail of costumer
+router.get('/:id/detail', costumerController.detail);
 
 // Update costumer with file upload
 router.post('/:id', upload.single('kop_surat'), costumerController.update);

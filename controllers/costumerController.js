@@ -77,3 +77,16 @@ exports.delete = async (req, res) => {
     res.status(500).send(err.message);
   }
 };
+
+exports.detail = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const [rows] = await pool.query('SELECT * FROM Costumer WHERE id = ?', [id]);
+    if (rows.length === 0) {
+      return res.status(404).send('Costumer not found');
+    }
+    res.render('costumer/detail', { costumer: rows[0], title: "Costumer Detail" });
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+};

@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-6">Customer Detail</h1>
+  <div class="mb-4">
+    <strong>Nama:</strong> <%= costumer.Nama %>
+  </div>
+  <div class="mb-4">
+    <strong>Jabatan:</strong> <%= costumer.Jabatan %>
+  </div>
+  <div class="mb-4">
+    <strong>NIP:</strong> <%= costumer.NIP %>
+  </div>
+  <div class="mb-4">
+    <strong>Sekolah:</strong> <%= costumer.Sekolah %>
+  </div>
+  <div class="mb-4">
+    <strong>Alamat:</strong> <%= costumer.Alamat %>
+  </div>
+  <div class="mb-4">
+    <strong>Kop Surat:</strong><br/>
+    <% if (costumer.kop_surat) { %>
+      <img src="<%= costumer.kop_surat %>" alt="Kop Surat" class="max-w-full h-auto rounded" />
+    <% } else { %>
+      <span>No Kop Surat uploaded</span>
+    <% } %>
+  </div>
+  <div class="mt-6">
+    <a href="/costumer" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Back to List</a>
+    <a href="/costumer/<%= costumer.id %>/edit" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition ml-4">Edit</a>
+  </div>
+</div>
+<%- include('../partials/footer') %>
