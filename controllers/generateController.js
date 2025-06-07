@@ -17,6 +17,8 @@ const Direktur = "Rochim Ramadhani Chiefto Irawan, S. Kom";
 const NPWP = "1000 0000 0107 3786";
 const AlamatKantor = "Tampat Durian No. 13 RT 003 RW 004 \n\nKel. Korong Gadang, Kec.kuranji, \n\nKota Padang 25156"
 const AlamatKantor2 = "Tampat Durian No. 13 RT 003 RW 004 Kel. Korong Gadang, Kec.kuranji, Kota Padang 25156"
+const telpon = "0811120910";
+
 const sekarang = new Date();
 
 const tanggal = sekarang.getDate().toString().padStart(2, '0'); // 2 digit, misal "03"
@@ -53,7 +55,7 @@ function terbilangManual(n) {
     return "Angka terlalu besar";
   }
 
-  return toWords(n).replace(/\s+/g, ' ').trim() + " rupiah";
+  return toWords(n).replace(/\s+/g, ' ').trim();
 }
 function capitalize(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -354,7 +356,7 @@ function drawTable(page, startX, startY, columns, rows, font, fontSize) {
 }
 
 exports.generateBOPSurat = async (req, res) => {
-  const { nomor, sifat, lampiran, invoiceId } = req.body;
+  const { nomor, sifat, lampiran, invoiceId,download } = req.body;
 
   try {
     const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
@@ -483,6 +485,23 @@ exports.generateBOPSurat = async (req, res) => {
 
     // Kirim PDF
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-BOP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/BOP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
     res.writeHead(200, {
       'Content-Type': 'application/pdf',
@@ -490,6 +509,7 @@ exports.generateBOPSurat = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate BOP PDF:', err.message);
@@ -499,7 +519,7 @@ exports.generateBOPSurat = async (req, res) => {
 
 exports.generateSHP = async (req, res) => {
   const {
-    nomor, sifat, lampiran, tujuanBelanja, invoiceId
+    nomor, sifat, lampiran, tujuanBelanja, invoiceId,download
   } = req.body;
 
   try {
@@ -615,11 +635,28 @@ exports.generateSHP = async (req, res) => {
     // Tulisan "Hormat kami" di bawah surat (misal di y=100)
     page.drawText(costumer.Nama, { x: 375, y: 50, size: fontSize, font: fontBold });
 
-    console.log('Mulai generate PDF');
+
+
     const pdfBytes = await pdfDoc.save();
-    console.log('PDF selesai generate, size:', pdfBytes.length);
+    
+    if(download){
+      const fileName = `${invoice.id}-SHP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SHP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
-    console.log('Buffer dibuat, size:', buffer.length);
+  
 
     res.writeHead(200, {
       'Content-Type': 'application/pdf',
@@ -627,7 +664,8 @@ exports.generateSHP = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
-    console.log('Response dikirim');
+  }
+    
 
   } catch (err) {
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -637,7 +675,7 @@ exports.generateSHP = async (req, res) => {
 // Generate SPH (Surat Penawaran Harga) - Price Quote Letter FROM PT. Mastah TO Customer
 exports.generateSPH = async (req, res) => {
   const {
-    nomor,tempat, perihal, invoiceId
+    nomor,tempat, perihal, invoiceId,download
   } = req.body;
 
   try {
@@ -768,9 +806,26 @@ exports.generateSPH = async (req, res) => {
     page.drawText(`${tempat}, ${tanggalFormatted}`, { x: startX, y: yPosition - 20, size: fontSize, font: fontRegular });
     page.drawText(`${PT}`, { x: startX, y: yPosition - 40, size: fontSize, font: fontBold });
     page.drawText(`${JabatanPT}`, { x: startX, y: yPosition - 100, size: fontSize, font: fontBold });
-    page.drawText(`${DirekturPT}`, { x: startX, y: yPosition - 120, size: fontSize, font: fontBold });
+    page.drawText(`${Direktur}`, { x: startX, y: yPosition - 120, size: fontSize, font: fontBold });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SPH.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SPH', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -779,6 +834,7 @@ exports.generateSPH = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+    } 
 
   } catch (err) {
     console.error('Gagal generate SPH PDF:', err.message);
@@ -790,7 +846,7 @@ exports.generateSPH = async (req, res) => {
 // Generate Daftar Hadir - Attendance List
 exports.generateDaftarHadir = async (req, res) => {
   const {
-    invoiceId, hariTanggal, waktu, tempat, orangtambahan,jabatanorang
+    invoiceId, hariTanggal, waktu, tempat, orangtambahan,jabatanorang,download
   } = req.body;
 
   try {
@@ -909,6 +965,23 @@ exports.generateDaftarHadir = async (req, res) => {
     page.drawText(`NIP. ${costumer.NIP}`, { x: 350, y: startY, size: fontSize, font: fontRegular });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-DH.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/DH', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -917,6 +990,7 @@ exports.generateDaftarHadir = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+    }
 
   } catch (err) {
     console.error('Gagal generate Daftar Hadir PDF:', err.message);
@@ -926,7 +1000,7 @@ exports.generateDaftarHadir = async (req, res) => {
 
 exports.generatePersetujuanNegosiasi = async (req, res) => {
   const {
-    nomor,  invoiceId, daerah
+    nomor,  invoiceId, daerah,download
   } = req.body;
 
   try {
@@ -1078,13 +1152,31 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
     yPosition -= 20;
     
     // Left signature
-    page.drawText(`${daerah} ${tanggalFormatted}`, { x: startX, y: yPosition, size: fontSize, font: fontRegular });
+    page.drawText(`${daerah}, ${tanggalFormatted}`, { x: startX, y: yPosition, size: fontSize, font: fontRegular });
     page.drawText(PT, { x: startX, y: yPosition - 15, size: fontSize, font: fontRegular });
     page.drawText(JabatanPT, { x: startX, y: yPosition - 100, size: fontSize, font: fontRegular });
     page.drawText(Direktur, { x: startX, y: yPosition - 115, size: fontSize, font: fontRegular });
 
    
     const pdfBytes = await pdfDoc.save();
+
+    
+    if(download){
+      const fileName = `${invoice.id}-PHN.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/PHN', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1093,6 +1185,7 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate Persetujuan Hasil Negosiasi PDF:', err.message);
@@ -1102,7 +1195,7 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
 
 exports.generateSPK = async (req, res) => {
   const {
-    nomorSPK, invoiceId, daerah,tanggalSPK,waktupelaksana,waktupenyelesaian
+    nomorSPK, invoiceId, daerah,tanggalSPK,waktupelaksana,waktupenyelesaian,download
   } = req.body;
 
   try {
@@ -1141,23 +1234,6 @@ exports.generateSPK = async (req, res) => {
     let startX = 70;
     let startY = 842 - height - 40;
 
-    // // Title
-    // const titleText = 'SURAT PERINTAH KERJA (SPK)';
-    // const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 4);
-    // const centerX = (595 - titleWidth) / 2;
-    
-    // page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 4, font: fontBold });
-    // startY -= 20;
-
-    // // Draw line under title
-    // page.drawLine({
-    //   start: { x: centerX, y: startY },
-    //   end: { x: centerX + titleWidth, y: startY },
-    //   thickness: 1,
-    //   color: rgb(0, 0, 0),
-    // });
-
-    // startY -= 30;
  // Contractor details
    function drawDetailLine(label, value, y, customX = startX,costomcolon = 150) {
   const labelX = customX;
@@ -1169,6 +1245,8 @@ exports.generateSPK = async (req, res) => {
   page.drawText(value || '-', { x: valueX, y, size: fontSize, font: fontRegular });
 }
 
+    let Ykeep = startY + 15;
+    startY -= 5;
     // Document number
     page.drawText(`SURAT PERINTAH KERJA (SPK)`, { x: startX, y: startY, size: fontSize, font: fontRegular });
     drawDetailLine('Nama Satuan Pendidikan', costumer.Sekolah, startY, startX + 180);
@@ -1176,9 +1254,16 @@ exports.generateSPK = async (req, res) => {
     drawDetailLine('Nomor SPK', nomorSPK, startY, startX + 180);
     startY -= 15;
     drawDetailLine('tanggal SPK', formatTanggalIndonesia(tanggalSPK), startY, startX + 180);
-    startY -= 15;
+    startY -= 10;
 
-    // drawDetailLine('Nama Satuan Pendidikan', costumer.Sekolah, startY,startX + 100);
+    page.drawLine({
+      start: { x: startX, y: startY },
+      end: { x: startX + 592 -140, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    
+    startY -= 15;
     
      // Document number
     page.drawText(`Paket Pekerjaan`, { x: startX, y: startY, size: fontSize, font: fontRegular });
@@ -1186,20 +1271,45 @@ exports.generateSPK = async (req, res) => {
     startY -= 15;
     const keteranganSPK = `SPK ini mulai berlaku efektif terhitung sejak tanggal ditetapkan dan penyelesaian keseluruhan pekerjaan sebagaimana dimaksud dalam SPK ini`;
     startY = drawParagraphJustify(page, keteranganSPK.trim(), startX + 180, startY, 250, 18, fontRegular, fontSize, '');
+    
+    page.drawLine({
+      start: { x: startX, y: startY },
+      end: { x: startX + 592 -140, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    page.drawLine({
+      start: { x: startX + 175, y: Ykeep},
+      end: { x: startX + 175 , y: startY  },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
     startY -= 20;
     drawDetailLine('WAKTU PELAKSANA PEKERJAAN',formatTanggalIndonesia( waktupelaksana), startY,startX,200);
     startY -= 20;
     drawDetailLine('WAKTU PENYELESAIAN PEKERJAAN',formatTanggalIndonesia( waktupenyelesaian), startY,startX,200);
+    startY -= 5;
+    page.drawLine({
+      start: { x: startX, y: startY },
+      end: { x: startX + 592 -140, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    
     startY -= 20;
-    // // // Introduction text
-    // const introText = `Yang bertanda tangan di bawah ini ${costumer.Jabatan} ${costumer.Sekolah}, dengan ini memerintahkan:`;
-    // let yPosition = drawParagraphJustify(page, introText.trim(), startX, startY, 450, 18, fontRegular, fontSize);
-    // yPosition -= 30;
+    
     const titleText = 'SURAT PERINTAH KERJA (SPK)';
     const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize);
     const centerX = (595 - titleWidth) / 2;
     page.drawText(titleText, { x: centerX, y: startY, size: fontSize, font: fontRegular });
-     startY -= 20;
+    startY -= 10;
+    page.drawLine({
+      start: { x: startX, y: startY },
+      end: { x: startX + 592 -140, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    startY -= 20;
     
     // Table
     const columns = [
@@ -1232,14 +1342,28 @@ exports.generateSPK = async (req, res) => {
     startY -= 20;
   const hasil = terbilangManual(invoice.Total_Harga)
     drawDetailLine('Terbilang', hasil , startY,startX,);
-    startY -= 30;
+    startY -= 15;
+    page.drawLine({
+      start: { x: startX, y: startY },
+      end: { x: startX + 592 -140, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+    startY -= 15;
     page.drawText(`INTRUKSI PENYEDIA`, { x: startX, y: startY, size: fontSize, font: fontRegular });
     startY -= 20;
+    
     const terms = "Penagihan hanya dapat di lakukan setelah penyelesaian pekerjaan yang diperintahkan dalam SPK ini dan dibuktikan dengan Surat Hasil Pemeriksaan dan Berita Acara Serah Terima "
     startY = drawParagraphJustify(page, terms.trim(), startX , startY, 500, 18, fontRegular, fontSize, '');
-
+    startY -= 5;
+  page.drawLine({
+        start: { x: startX, y: startY },
+        end: { x: startX + 592 -140, y: startY },
+        thickness: 1,
+        color: rgb(0, 0, 0),
+      });
     // Signatures
-    startY -= 20;
+    startY -= 5;
     
     // Left signature
     page.drawText(PT, { x: startX, y: startY - 30, size: fontSize, font: fontRegular });
@@ -1252,6 +1376,23 @@ exports.generateSPK = async (req, res) => {
     page.drawText(`NIP. ${costumer.NIP}`, { x: 350, y: startY - 115, size: fontSize, font: fontRegular });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SPK.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SPK', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1260,6 +1401,7 @@ exports.generateSPK = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate SPK PDF:', err.message);
@@ -1269,7 +1411,7 @@ exports.generateSPK = async (req, res) => {
 
 exports.generateUndanganNegosiasi = async (req, res) => {
   const {
-    nomor, lampiran, invoiceId, hariTanggal, waktu, tempat, alamat, acara, daerah
+    nomor, lampiran, invoiceId, hariTanggal, waktu, tempat, alamat, acara, daerah,download
   } = req.body;
 
   try {
@@ -1390,6 +1532,23 @@ exports.generateUndanganNegosiasi = async (req, res) => {
     page.drawText(`NIP. ${costumer.NIP}`, { x: 350, y: 200 - 115, size: fontSize, font: fontRegular });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-UN.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/UN', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1398,6 +1557,7 @@ exports.generateUndanganNegosiasi = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate Undangan Negosiasi PDF:', err.message);
@@ -1408,7 +1568,7 @@ exports.generateUndanganNegosiasi = async (req, res) => {
 // Generate Surat Kesanggupan Melaksanakan - Letter of Commitment to Execute
 exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
   const {
-    nomor, invoiceId,
+    nomor, invoiceId,download
   } = req.body;
 
   try {
@@ -1542,6 +1702,23 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
     page.drawText(Direktur, { x: startX, y: startY, size: fontSize, font: fontBold });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SKM.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SKM', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1550,6 +1727,7 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+    }
 
   } catch (err) {
     console.error('Gagal generate Surat Kesanggupan Melaksanakan PDF:', err.message);
@@ -1561,7 +1739,7 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
 // Generate Surat Kesanggupan Melaksanakan - Letter of Commitment to Execute
 exports.generateSuratJalan = async (req, res) => {
   const {
-    nomor, invoiceId,notelpon,plat,kendaraan,tanggalsurat,driver
+    nomor, invoiceId,notelpon,plat,kendaraan,tanggalsurat,driver,download
   } = req.body;
 
   try {
@@ -1685,6 +1863,23 @@ exports.generateSuratJalan = async (req, res) => {
 
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SJ.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SJ', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1693,6 +1888,7 @@ exports.generateSuratJalan = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+    }
 
   } catch (err) {
     console.error('Gagal generate Surat Jalan PDF:', err.message);
@@ -1704,7 +1900,7 @@ exports.generateSuratJalan = async (req, res) => {
 
 exports.generateSuratSerahTerima = async (req, res) => {
   const {
-    nomor, invoiceId,daerah,tanggalsurat
+    nomor, invoiceId,daerah,tanggalsurat,download
   } = req.body;
 
   try {
@@ -1804,6 +2000,23 @@ exports.generateSuratSerahTerima = async (req, res) => {
     page.drawText("........................................", { x: startX + 300, y: startY, size: fontSize, font: fontBold });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SST.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SST', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -1812,7 +2025,7 @@ exports.generateSuratSerahTerima = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
-
+    }
   } catch (err) {
     console.error('Gagal generate Surat Serah Terima PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -1822,7 +2035,7 @@ exports.generateSuratSerahTerima = async (req, res) => {
 
 exports.generateTemplate = async (req, res) => {
   const {
-    nomor, invoiceId,daerah,tanggalsurat
+    nomor, invoiceId,daerah,tanggalsurat,download
   } = req.body;
 
   try {
@@ -1883,7 +2096,7 @@ exports.generateTemplate = async (req, res) => {
 
 exports.generateBeritaAcaraPenerimaan = async (req, res) => {
   const {
-    nomor, invoiceId, 
+    nomor, invoiceId,download
   } = req.body;
 
   try {
@@ -2016,6 +2229,23 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
 
     // Save and send PDF
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-BAP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/BAP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2024,7 +2254,7 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
-
+    }
   } catch (err) {
     console.error('Gagal generate Berita Acara Penerimaan PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -2033,7 +2263,7 @@ exports.generateBeritaAcaraPenerimaan = async (req, res) => {
 
 exports.generateFaktur = async (req, res) => {
   const {
-    nomor, invoiceId,daerah, rekening,atasnama,bank
+    nomor, invoiceId,daerah, rekening,atasnama,bank,download
   } = req.body;
 
   try {
@@ -2155,6 +2385,23 @@ exports.generateFaktur = async (req, res) => {
 
    
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-Faktur.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/Faktur', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2163,7 +2410,7 @@ exports.generateFaktur = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
-
+  }
   } catch (err) {
     console.error('Gagal generate Surat Serah Terima PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -2172,7 +2419,7 @@ exports.generateFaktur = async (req, res) => {
 
 exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
   const {
-    nomor, invoiceId,tanggalsurat
+    nomor, invoiceId,tanggalsurat,download
   } = req.body;
 
   try {
@@ -2376,6 +2623,23 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
     page2.drawText(JabatanPT, { x: startX2, y: startY2 - 75, size: fontSize, font: fontRegular });
     page2.drawText(Direktur, { x: startX2, y: startY2 - 90, size: fontSize, font: fontRegular });
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-BAPe.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/BAPe', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2384,6 +2648,7 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate Surat Berita Acara Pemeriksaan PDF:', err.message);
@@ -2394,7 +2659,7 @@ exports.generateBeritaAcaraPemeriksaan = async (req, res) => {
 
 exports.generateBeritaAcaraSerahTerima = async (req, res) => {
   const {
-    nomor, invoiceId, tanggalsurat,nama,jabatan
+    nomor, invoiceId, tanggalsurat,download
   } = req.body;
 
   try {
@@ -2470,9 +2735,9 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
     yPosition -= 20;
 
     // First party details
-    drawLabelColonValue('Nama', nama, yPosition, startX + 20);
+    drawLabelColonValue('Nama', pphp[0].Nama, yPosition, startX + 20);
     yPosition -= 15;
-    drawLabelColonValue('Jabatan', jabatan, yPosition, startX + 20);
+    drawLabelColonValue('Jabatan', 'Ketua TIM Pemeriksa Barang', yPosition, startX + 20);
    
     yPosition -= 30;
 
@@ -2518,8 +2783,8 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
 
     // Right signature (PIHAK PERTAMA)
     page.drawText('Yang Menerima', { x: startX + 300, y: yPosition, size: fontSize, font: fontBold });
-    page.drawText(costumer.Nama, { x: startX + 300, y: yPosition - 80, size: fontSize, font: fontRegular });
-    page.drawText(`NIP. ${costumer.NIP}`, { x: startX + 300, y: yPosition - 95, size: fontSize, font: fontRegular });
+    page.drawText(pphp[0].Nama, { x: startX + 300, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${pphp[0].NIP}`, { x: startX + 300, y: yPosition - 95, size: fontSize, font: fontRegular });
 
     yPosition -= 120;
     page.drawText('Mengetahui', { x: centerX + titleWidth / 3 , y: yPosition, size: fontSize, font: fontBold });
@@ -2586,6 +2851,23 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
     page2.drawText(Direktur, { x: startX2, y: startY2 - 105, size: fontSize, font: fontRegular });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-BAST.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/BAST', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2594,6 +2876,7 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+    }
 
   } catch (err) {
     console.error('Gagal generate Berita Acara Serah Terima PDF:', err.message);
@@ -2606,7 +2889,7 @@ exports.generateBeritaAcaraSerahTerima = async (req, res) => {
 
 exports.generateKwitansi = async (req, res) => {
   const {
-    nomor, invoiceId,daerah,tanggalsurat,diterima,pembayaran,bank,atasnama,rekening
+    nomor, invoiceId,daerah,tanggalsurat,diterima,pembayaran,bank,atasnama,rekening,download
   } = req.body;
 
   try {
@@ -2712,6 +2995,23 @@ function drawDetailWrapped(label, value, y) {
     page.drawText(Direktur, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
 
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-Kwitansi.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/Kwitansi', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2720,6 +3020,7 @@ function drawDetailWrapped(label, value, y) {
       'Content-Length': buffer.length
     });
     res.end(buffer);
+  }
 
   } catch (err) {
     console.error('Gagal generate Kwitansi PDF:', err.message);
@@ -2731,7 +3032,7 @@ function drawDetailWrapped(label, value, y) {
 
 exports.generateDokumenPerencanaan = async (req, res) => {
   const {
-    invoiceId,kategori,tanggalserahterima
+    invoiceId,kategori,tanggalserahterima,download
   } = req.body;
 
   try {
@@ -2815,8 +3116,6 @@ exports.generateDokumenPerencanaan = async (req, res) => {
       { header: 'No', key: 'no', width: 30 },
       { header: 'Jenis', key: 'jenis', width: 150 },
       { header: 'Keterangan', key: 'keterangan', width: 300 },
-      
-      
     ];
     
 
@@ -2865,6 +3164,23 @@ exports.generateDokumenPerencanaan = async (req, res) => {
 
     
     const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-DP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/DP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
     const buffer = Buffer.from(pdfBytes);
 
     res.writeHead(200, {
@@ -2873,7 +3189,7 @@ exports.generateDokumenPerencanaan = async (req, res) => {
       'Content-Length': buffer.length
     });
     res.end(buffer);
-
+    }
   } catch (err) {
     console.error('Gagal generate Dokumen Perencanaan PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
@@ -2883,7 +3199,7 @@ exports.generateDokumenPerencanaan = async (req, res) => {
 
 exports.generateHPS = async (req, res) => {
   const {
-    invoiceId
+    invoiceId,download
   } = req.body;
 
   try {
@@ -3001,17 +3317,774 @@ exports.generateHPS = async (req, res) => {
 
     
     const pdfBytes = await pdfDoc.save();
-    const buffer = Buffer.from(pdfBytes);
 
-    res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment; filename="hps.pdf"',
-      'Content-Length': buffer.length
-    });
-    res.end(buffer);
+    if(download){
+      const fileName = `${invoice.id}-HPS.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/HPS', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
 
-  } catch (err) {
+      
+      const buffer = Buffer.from(pdfBytes);
+
+      res.writeHead(200, {
+          'Content-Type': 'application/pdf',
+          'Content-Disposition': 'attachment; filename="hps.pdf"',
+          'Content-Length': buffer.length
+        });
+        res.end(buffer);
+        
+      }
+      } catch (err) {
     console.error('Gagal generate HPS PDF:', err.message);
     res.status(500).send(`Terjadi kesalahan: ${err.message}`);
   }
 };
+
+
+
+
+exports.generateDokumenHasilPerbandingan = async (req, res) => {
+  const {
+    invoiceId,calonpenyedia,estimasipengirimanproduk1,estimasipengirimanproduk2,alamatcalon,harga,download
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 40;
+ // Title
+    const titleText = 'DOKUMEN HASIL PEMBANDINGAN';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+
+    function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 150;
+      const valueX = startX + 170;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+    startY-= 20;
+    yPosition  = startY;
+    yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition);
+    yPosition = drawDetailWrapped('Hasil Pembandingan', `Rp. ${invoice.Total_Harga},- / ${PT} `, yPosition);
+    yPosition -= 30;
+
+   startY = yPosition;
+
+    const columns = [
+      { header: '', key: 'label', width: 80 },  
+      { header: 'Produk 1', key: 'produk1', width: 150 },
+      { header: 'Produk 2', key: 'produk2', width: 150 },
+      { header: 'Dst', key: 'dst', width: 120 },
+    ];
+
+    const rows = [
+      {
+        label: 'Nama Calon Penyedia',
+        produk1: 'CV. Abhiseva Intinusa',
+        produk2: calonpenyedia,
+        dst: '……………',
+      },
+      {
+        label: 'Nama Produk',
+        produk1: costumer.Kegiatan,
+        produk2: costumer.Kegiatan,
+        dst: '……………',
+      },
+      {
+        label: 'Gambar Produk',
+        produk1: '',
+        produk2: '',
+        dst: '……………',
+      },
+      {
+        label: 'Harga Satuan',
+        produk1: invoice.Total_Harga,
+        produk2: harga,
+        dst: '……………',
+      },
+      {
+        label: 'Spesifikasi',
+        produk1: `Jasa serta bahan pekerjaan Belanja ${invoice.Kegiatan}`,
+        produk2: `Jasa serta bahan pekerjaan Belanja ${invoice.Kegiatan}`,
+        dst: '……………',
+      },
+      {
+        label: 'Estimasi Pengiriman',
+        produk1: estimasipengirimanproduk1,
+        produk2: estimasipengirimanproduk2,
+        dst: '……………',
+      },
+      {
+        label: 'Alamat Calon Penyedia',
+        produk1: AlamatKantor2,
+        produk2: alamatcalon,
+        dst: '……………',
+      },
+    ];
+
+    startY = drawTable(page, startX, startY, columns, rows, fontRegular, fontSize);
+
+    yPosition = startY - 50;
+       // Left signature (PIHAK KEDUA)
+       startX += 280;
+    page.drawText(`Pejabat Pelaksana Teknis Kegiatan`, { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(costumer.Jabatan, { x: startX, y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${costumer.NIP}`, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+
+    
+    const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-DHP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/DHP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="dokumenhasilperbandingan.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+  }
+
+  } catch (err) {
+    console.error('Gagal generate dokumenhasilperbandingan PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+exports.generateDokumenHasilNegosiasi = async (req, res) => {
+  const {
+    invoiceId,daerah,tanggalterima,download
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 40;
+ // Title
+    const titleText = 'DOKUMEN HASIL NEGOSIASI';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+     startY -= 15;
+    drawLabelColonValue('Nomor', nomor || '', startY,centerX + titleWidth / 3, 35, 40);
+
+    function drawDetailWrapped(label, value, y) {
+      const labelX = startX + 20;
+      const colonX = startX + 150;
+      const valueX = startX + 170;
+      const maxWidth = 350;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) - 5;
+    }
+    startY-= 20;
+    yPosition  = startY;
+    yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition);
+    yPosition = drawDetailWrapped('Alamat Satuan Pendidikan', costumer.Alamat, yPosition);
+    yPosition = drawDetailWrapped('Nama Calon Penyedia', PT, yPosition);
+    yPosition = drawDetailWrapped('Tanggal Terima Barang/ Jasa', tanggalterima, yPosition);
+    yPosition = drawDetailWrapped('Hasil Negosiasi', invoice.Total_Harga, yPosition);
+    yPosition -= 30;
+
+    startY = yPosition;
+
+   
+    // Table
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Nama Produk', key: 'namabarang', width: 100 },
+      { header: 'Qty', key: 'qty', width: 60 },
+      { header: 'Harga Penawaran', key: 'hargapenawaran', width: 100 },
+      { header: 'Harga Negosiasi', key: 'harganegosiasi', width: 100 },
+      { header: 'Keterangan', key: 'keterangan', width: 100 },
+   
+    ];
+
+    const rows = detail_invoice.map((item, idx) => ({
+      no: (idx + 1).toString(),
+      namabarang: item.Nama_Barang || '',
+      qty: item.Qty ? item.Qty.toString() : '',
+      hargapenawaran: item.Harga_Satuan ? item.Harga_Satuan.toString() : '',
+      harganegosiasi: item.Harga_Satuan ? item.Harga_Satuan.toString() : '',
+      keterangan: "" ,
+    }));
+    startY = drawTable(page, startX, startY, columns, rows,  fontRegular, fontSize);
+    yPosition = startY - 50;
+      
+      page.drawText(PT, { x: startX  , y: yPosition - 15, size: fontSize, font: fontRegular });
+      page.drawText(JabatanPT, { x: startX  , y: yPosition - 100, size: fontSize, font: fontRegular });
+      page.drawText(Direktur, { x: startX  , y: yPosition - 115, size: fontSize, font: fontRegular });
+      startX += 300;
+      page.drawText(`${daerah} ${tanggalFormatted}`, { x: startX , y: yPosition, size: fontSize, font: fontRegular });
+      page.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: startX  , y: yPosition - 15, size: fontSize, font: fontRegular });
+      page.drawText(costumer.Nama, { x: startX, y: yPosition - 100, size: fontSize, font: fontRegular });
+      page.drawText(costumer.NIP, { x: startX, y: yPosition - 115, size: fontSize, font: fontRegular });
+
+    const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-DHN.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/DHN', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="DokumenHasilNegosiasi.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+  }
+
+  } catch (err) {
+    console.error('Gagal generate DokumenHasilNegosiasi PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+exports.generateSHPP = async (req, res) => {
+  const {
+    invoiceId,tanggal,tanggalditerima,notelpon,nomor,download
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+     const [pphprows] = await pool.query('SELECT * FROM PPHP WHERE Invoice_id = ?', [invoiceId]);
+    const pphp = pphprows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 25;
+ // Title
+    const titleText = 'SURAT HASIL PEMERIKSAAN PEKERJAAN';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+     // Letter header details
+    function drawLabelColonValue(label, value, y, x, colon = 100, end = 120) {
+      page.drawText(label, { x: x, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: x + colon, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: x + end, y, size: fontSize, font: fontRegular });
+    }
+
+    startY -= 15;
+    drawLabelColonValue('Nomor', nomor || '', startY,centerX  + titleWidth/3 -20, 35, 40);
+
+    function drawDetailWrapped(label, value, y,costomX = startX) {
+      const labelX = costomX + 20;
+      const colonX = costomX + 170;
+      const valueX = costomX + 190;
+      const maxWidth = 300;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) ;
+    }
+    startY-= 10;
+
+     yPosition = startY -10;
+     // Closing paragraph
+     const suratText =   `Pada hari ini ${formatTanggalLisan(tanggal)}, sesuai dengan :`;
+     yPosition = drawParagraphJustify(page, suratText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+     
+     startY = yPosition - 5;
+     yPosition  = startY;
+     yPosition = drawDetailWrapped('Nomor Surat Pemesanan', ``, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Tanggal', formatTanggalIndonesia(tanggalditerima), yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama Pekerjaan', invoice.Kegiatan, yPosition,startX + 40);
+     yPosition -= 5;
+     yPosition = drawDetailWrapped('Yang bertanda tangan di bawah ini', '', yPosition);
+     yPosition -= 5;
+     yPosition = drawDetailWrapped('Tahun', `${tahun}`, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama', costumer.Nama, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Jabatan','Pejabat Pelaksana Teknis Kegiatan', yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Alamat Satuan Pendidikan ', costumer.Alamat, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('No Telpon :', notelpon, yPosition,startX + 40);
+     
+     yPosition -= 10;
+     
+     const caseText =   `Telah melakukan pemeriksaan terhadap hasil pekerjaan sesuai surat pemesanan dimaksud dengan rincian berikut :`;
+     yPosition = drawParagraphJustify(page, caseText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+
+    startY = yPosition;
+    
+    // Table
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Nama Barang / Jasa', key: 'namabarang', width: 150 },
+      { header: 'Jumlah', key: 'qty', width: 60 },
+      { header: 'Spesifikasi', key: 'spesifikasi', width: 150 },
+      { header: 'Kondisi', key: 'kondisi', width: 100 },
+
+    ];
+
+    const rows = detail_invoice.map((item, idx) => ({
+      no: (idx + 1).toString(),
+      namabarang: item.Nama_Barang || '',
+      qty: item.Qty ? item.Qty.toString() : '',
+      spesifikasi: 'Sesuai / Belum Sesuai',
+      kondisi:'Baik / Rusak',
+   
+    }));
+    startY = drawTable(page, startX, startY, columns, rows,  fontRegular, fontSize);
+    yPosition = startY - 10;
+   const closingText =   `Demikian Surat Pemeriksaan Hasil Pekerjaan ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana seharusnya.`;
+    yPosition = drawParagraphJustify(page, closingText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+    
+        // Right signature
+    page.drawText('PIHAK KEDUA', { x: startX, y: yPosition, size: fontSize, font: fontBold });
+    page.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: startX  , y: yPosition - 15, size: fontSize, font: fontRegular });
+    page.drawText(costumer.Nama, { x: startX, y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(costumer.NIP, { x: startX, y: yPosition - 95, size: fontSize, font: fontRegular });
+    // Left signature
+    page.drawText('PIHAK PERTAMA', { x: startX + 300  , y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(JabatanPT, { x: startX + 300 , y: yPosition - 80, size: fontSize, font: fontRegular });
+    page.drawText(Direktur, { x: startX + 300 , y: yPosition - 95, size: fontSize, font: fontRegular });
+    
+
+   yPosition -= 120;
+    page.drawText('Pemeriksa Barang', { x: centerX + titleWidth / 3 , y: yPosition, size: fontSize, font: fontBold });
+    page.drawText(pphp[0].Nama, { x: centerX + titleWidth / 3 , y: yPosition - 70, size: fontSize, font: fontRegular });
+    page.drawText(`NIP. ${pphp[0].NIP}`, { x: centerX + titleWidth / 3 , y: yPosition - 85, size: fontSize, font: fontRegular });
+
+
+    
+    const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-SHPP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/SHPP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="SHPP.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+  }
+
+  } catch (err) {
+    console.error('Gagal generate SHPP PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+
+
+
+
+exports.generateBeritaAcaraSerahTerimaPekerjaan = async (req, res) => {
+  const {
+    invoiceId,tanggal,tanggalditerima,notelpon,nomor,download 
+  } = req.body;
+
+  try {
+    const [invoicerows] = await pool.query('SELECT * FROM Invoice WHERE id = ?', [invoiceId]);
+    const invoice = invoicerows[0]; 
+    if (!invoice) {
+      return res.status(400).send('Invoice tidak valid atau belum dipilih');
+    }
+    const [costumerrows] = await pool.query('SELECT * FROM costumer WHERE id = ?', [invoice.Costumer_id]);
+    const costumer = costumerrows[0]; 
+    const [detail_invoicerows] = await pool.query('SELECT * FROM detail_invoice WHERE Invoice_id = ?', [invoiceId]);
+    const detail_invoice = detail_invoicerows;
+     const [pphprows] = await pool.query('SELECT * FROM PPHP WHERE Invoice_id = ?', [invoiceId]);
+    const pphp = pphprows;
+
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([595, 842]); // A4
+    const page2 = pdfDoc.addPage([595, 842]); // A4
+
+    // Use PT. Mastah letterhead
+    const templatePath = path.join(__dirname, '..', 'public', costumer.kop_surat);
+    if (!fs.existsSync(templatePath)) {
+      return res.status(404).send("Template image not found.");
+    }
+    const templateImageBytes = fs.readFileSync(templatePath);
+
+    // Embed kop_surat image
+    const pngImage = await pdfDoc.embedPng(templateImageBytes);
+    const scale = 595 / pngImage.width;
+    const height = pngImage.height * scale;
+    page.drawImage(pngImage, { x: 0, y: 842 - height, width: 595, height });
+
+    // Fonts
+    const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+    const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+    const fontSize = 11;
+
+    // Starting points
+    let startX = 70;
+    let startY = 842 - height - 25;
+ // Title
+    const titleText = 'SURAT HASIL PEMERIKSAAN PEKERJAAN';
+    const titleWidth = fontBold.widthOfTextAtSize(titleText, fontSize + 2);
+    const centerX = (595 - titleWidth) / 2;
+    
+    page.drawText(titleText, { x: centerX, y: startY, size: fontSize + 2, font: fontBold });
+    startY -= 5;
+
+    // Draw line under title
+    page.drawLine({
+      start: { x: centerX, y: startY },
+      end: { x: centerX + titleWidth, y: startY },
+      thickness: 1,
+      color: rgb(0, 0, 0),
+    });
+     // Letter header details
+    function drawLabelColonValue(label, value, y, x, colon = 100, end = 120) {
+      page.drawText(label, { x: x, y, size: fontSize, font: fontRegular });
+      page.drawText(':', { x: x + colon, y, size: fontSize, font: fontRegular });
+      page.drawText(value, { x: x + end, y, size: fontSize, font: fontRegular });
+    }
+
+    startY -= 15;
+    drawLabelColonValue('Nomor', nomor || '', startY,centerX  + titleWidth/3 -20, 35, 40);
+
+    function drawDetailWrapped(label, value, y,costomX = startX) {
+      const labelX = costomX + 20;
+      const colonX = costomX + 170;
+      const valueX = costomX + 190;
+      const maxWidth = 300;
+
+      page.drawText(label, { x: labelX, y, size: fontSize, font: fontRegular});
+      page.drawText(':', { x: colonX, y, size: fontSize, font: fontRegular});
+
+      const lines = wrapText(value, maxWidth, fontRegular, fontSize);
+      lines.forEach((line, i) => {
+        const lineY = y - i * (fontSize + 4);
+        page.drawText(line, { x: valueX, y: lineY, size: fontSize, font: fontRegular });
+      });
+
+      return y - lines.length * (fontSize + 4) ;
+    }
+    startY-= 10;
+
+     yPosition = startY -10;
+     // Closing paragraph
+     const suratText =   `Pada hari ini ${formatTanggalLisan(tanggal)}, sesuai dengan :`;
+     yPosition = drawParagraphJustify(page, suratText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+     
+     startY = yPosition - 5;
+     yPosition  = startY;
+     yPosition = drawDetailWrapped('Nomor Surat Pemesanan', ``, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Tanggal', formatTanggalIndonesia(tanggalditerima), yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama Pekerjaan', invoice.Kegiatan, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Tahun', `${tahun}`, yPosition,startX + 40);
+     yPosition -= 5;
+     yPosition = drawDetailWrapped('Yang bertanda tangan di bawah ini', '', yPosition);
+     yPosition -= 5;
+     yPosition = drawDetailWrapped('Nama', Direktur, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Jabatan',JabatanPT, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama Penyedia', PT , yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Alamat Penyedia', AlamatKantor2, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('No Telpon :', telpon, yPosition,startX + 40);
+     yPosition -= 5;
+     yPosition = drawDetailWrapped('Sebagai pihak yang menyerahkan, selanjutnya disebut PIHAK PERTAMA', '', yPosition);
+     yPosition -= 5;
+      yPosition = drawDetailWrapped('Nama', costumer.Nama, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Jabatan','Pejabat Pelaksana Teknis Kegiatan', yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Nama Satuan Pendidikan', costumer.Sekolah, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('Alamat Satuan Pendidikan ', costumer.Alamat, yPosition,startX + 40);
+     yPosition = drawDetailWrapped('No Telpon :', notelpon, yPosition,startX + 40);
+      yPosition -= 5;
+     yPosition = drawDetailWrapped('Sebagai pihak yang menerima, selanjutnya disebut PIHAK KEDUA', '', yPosition);
+     yPosition -= 5;
+     yPosition -= 10;
+     const caseText =   `PIHAK PERTAMA menyerahkan hasil pekerjaan Belanja ${invoice.Kegiatan} kepada PIHAK KEDUA, dan PIHAK KEDUA telah menerima hasil pekerjaan tersebut dalam jumlah yang lengkap dan kondisi yang baik sesuai dengan rincian berikut :`;
+     yPosition = drawParagraphJustify(page, caseText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
+
+    startY = yPosition;
+    
+    // Table
+    const columns = [
+      { header: 'No', key: 'no', width: 30 },
+      { header: 'Nama Barang / Jasa', key: 'namabarang', width: 150 },
+      { header: 'Jumlah Diserahkan', key: 'qty', width: 100 },
+      { header: 'Jumlah Diterima', key: 'jumlah', width: 100 },
+      { header: 'Kondisi', key: 'kondisi', width: 100 },
+
+    ];
+
+    const rows = detail_invoice.map((item, idx) => ({
+      no: (idx + 1).toString(),
+      namabarang: item.Nama_Barang || '',
+      qty: item.Qty ? item.Qty.toString() : '',
+      jumlah: item.Qty ? item.Qty.toString() : '',
+      kondisi:'Baik / Rusak',
+    }));
+    startY = drawTable(page, startX, startY, columns, rows,  fontRegular, fontSize);
+    yPosition = startY - 10;
+
+
+    //Page 2
+
+   // Starting points
+    let startX2 = 70;
+    let startY2 = 842 - 50;
+
+    let yPosition2 = startY2;
+    const caseText2 =   `Berita Acara Serah Terima ini berfungsi sebagai bukti serah terima hasil pekerjaan kepada PIHAK KEDUA, untuk selanjutnya dicatat pada buku penerimaan barang Satuan Pendidikan. `;
+     yPosition2 = drawParagraphJustify(page2, caseText2.trim(), startX, yPosition2, 450, 18, fontRegular, fontSize);
+    yPosition2 -= 20;
+    const closingText =   `Demikian Berita Acara Serah Terima ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana seharusnya.  `;
+     yPosition2 = drawParagraphJustify(page2, closingText.trim(), startX, yPosition2, 450, 18, fontRegular, fontSize);
+    yPosition2 -= 50;
+
+
+         // Right signature
+    page2.drawText('PIHAK KEDUA', { x: startX, y: yPosition2, size: fontSize, font: fontBold });
+    page2.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: startX  , y: yPosition2 - 15, size: fontSize, font: fontRegular });
+    page2.drawText(costumer.Nama, { x: startX, y: yPosition2 - 80, size: fontSize, font: fontRegular });
+    page2.drawText(costumer.NIP, { x: startX, y: yPosition2 - 95, size: fontSize, font: fontRegular });
+    // Left signature
+    page2.drawText('PIHAK PERTAMA', { x: startX + 300  , y: yPosition2, size: fontSize, font: fontBold });
+    page2.drawText(JabatanPT, { x: startX + 300 , y: yPosition2 - 80, size: fontSize, font: fontRegular });
+    page2.drawText(Direktur, { x: startX + 300 , y: yPosition2 - 95, size: fontSize, font: fontRegular });
+    
+
+    yPosition2 -= 120;
+    page2.drawText('Pemeriksa Barang', { x: centerX + titleWidth / 3 , y: yPosition2, size: fontSize, font: fontBold });
+    page2.drawText(pphp[0].Nama, { x: centerX + titleWidth / 3 , y: yPosition2 - 70, size: fontSize, font: fontRegular });
+    page2.drawText(`NIP. ${pphp[0].NIP}`, { x: centerX + titleWidth / 3 , y: yPosition2 - 85, size: fontSize, font: fontRegular });
+
+
+    const pdfBytes = await pdfDoc.save();
+    
+    if(download){
+      const fileName = `${invoice.id}-BASTP.pdf`;
+      const filePath = path.join(__dirname, '../public/pdf/BASTP', fileName);
+      
+      // Hapus file lama jika ada
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
+      
+      // Tulis file baru
+      fs.writeFileSync(filePath, pdfBytes);
+      
+      // Kirim ke browser
+      res.download(filePath, fileName);
+      
+    }else{
+    const buffer = Buffer.from(pdfBytes);
+
+    res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment; filename="BeritaAcaraSerahTerimaPekerjaan.pdf"',
+      'Content-Length': buffer.length
+    });
+    res.end(buffer);
+  }
+
+  } catch (err) {
+    console.error('Gagal generate BeritaAcaraSerahTerimaPekerjaan PDF:', err.message);
+    res.status(500).send(`Terjadi kesalahan: ${err.message}`);
+  }
+};
+

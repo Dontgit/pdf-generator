@@ -34,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.redirect('/costumer');
 });
+app.use('/pdf', express.static(path.join(__dirname, 'public/pdf')));
 
 // Import routes
 const costumerRoutes = require('./routes/costumer');
