@@ -15,10 +15,10 @@ async function updateInvoiceTotals(invoice_id) {
       [total, ppn, total_harga, invoice_id]
     );
     const [rows_sn] = await pool.query(
-      'SELECT SUM(Jumlah) as total FROM Detail_Invoice WHERE Invoice_id = ?',
+      'SELECT SUM(Jumlah_sn) as total FROM Detail_Invoice WHERE Invoice_id = ?',
       [invoice_id]
     );
-    const total_sn = Number(rows_sn[0].total_sn) || 0;
+    const total_sn = Number(rows_sn[0].total) || 0;
     const ppn_sn = total_sn * 0.12;
     const total_sn_harga = total_sn + ppn_sn;
    

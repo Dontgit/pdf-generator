@@ -1,6 +1,4 @@
- 
-
-<%- include('../partials/header') %>
+  <%- include('../partials/header') %>
 <div class="flex flex-col md:flex-row justify-between items-center mb-6">
   <h1 class="text-3xl font-extrabold text-gray-900 mb-4 md:mb-0">Invoice List</h1>
   <a href="/invoice/new" class="inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
@@ -11,40 +9,40 @@
 <div class="overflow-x-auto bg-white rounded-lg shadow">
   <table class="min-w-full divide-y divide-gray-200">
     <thead class="bg-gray-50">
-  <tr>
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kegiatan</th>
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga</th>
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga Setelah Nego</th>
-    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-  </tr>
-</thead>
-<tbody class="bg-white divide-y divide-gray-200">
-  <% invoices.forEach(invoice => { %>
-    <tr>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Kegiatan %></td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Sekolah %></td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga %></td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga_sn %></td>
-      <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
-        <!-- Tombol untuk melihat detail invoice -->
-        <button onclick="openInvoiceDetailModal(<%= invoice.id %>)" class="text-green-600 hover:text-green-900" title="View Full Details">
-          <i class="fa fa-eye"></i> View Details
-        </button>
-        <a href="/invoice/<%= invoice.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit Invoice">
-          <i class="fa fa-edit"></i>
-        </a>
-        <form action="/invoice/<%= invoice.id %>/delete" method="POST" onsubmit="return confirmDelete(event)">
-          <button type="submit" class="text-red-600 hover:text-red-900" title="Delete Invoice">
-            <i class="fa fa-trash"></i>
-          </button>
-        </form>
-      </td>
-    </tr>
-  <% }) %>
-</tbody>
-
-
+      <tr>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kegiatan</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga Setelah Nego</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% invoices.forEach(invoice => { %>
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Kegiatan %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Sekolah %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga_sn %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
+            <button onclick="openFullDataModal('<%= JSON.stringify(invoice).replace(/'/g, '&#39;') %>')" class="text-purple-600 hover:text-purple-900" title="View Full Data">
+              <i class="fa fa-eye"></i>
+            </button>
+            <button onclick="openDetailModal(<%= invoice.id %>)" class="text-green-600 hover:text-green-900" title="View Details">
+              <i class="fa fa-list"></i>
+            </button>
+            <a href="/invoice/<%= invoice.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit Invoice">
+              <i class="fa fa-edit"></i>
+            </a>
+            <form action="/invoice/<%= invoice.id %>/delete" method="POST" onsubmit="return confirmDelete(event)">
+              <button type="submit" class="text-red-600 hover:text-red-900" title="Delete Invoice">
+                <i class="fa fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
   </table>
 </div>
 
@@ -131,34 +129,23 @@
     </div>
   </div>
 </div>
-<!-- Detail Invoice Modal -->
-<div id="invoiceDetailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
-  <div class="bg-white rounded-lg shadow-lg w-4/5 max-w-4xl p-6 overflow-auto max-h-[80vh]">
+
+<!-- Full Data Modal -->
+<div id="fullDataModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-lg w-3/4 max-w-3xl p-6 overflow-auto max-h-[80vh]">
     <div class="flex justify-between items-center mb-4">
-      <h2 class="text-xl font-bold">Invoice Full Details</h2>
-      <button onclick="closeInvoiceDetailModal()" class="text-gray-600 hover:text-gray-900">
+      <h2 class="text-xl font-bold">Full Invoice Data</h2>
+      <button onclick="closeFullDataModal()" class="text-gray-600 hover:text-gray-900">
         <i class="fa fa-times"></i>
       </button>
     </div>
-    <div>
-      <!-- Full details table -->
-      <table class="min-w-full divide-y divide-gray-200 mb-4">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Field</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Value</th>
-          </tr>
-        </thead>
-        <tbody id="invoiceDetailBody" class="bg-white divide-y divide-gray-200">
-          <!-- Data invoice akan dimasukkan secara dinamis di sini -->
-        </tbody>
-      </table>
+    <div id="fullDataContent" class="text-sm text-gray-800 space-y-2">
+      <!-- Full invoice data will be populated here -->
     </div>
   </div>
 </div>
 
 <script>
-  
   function confirmDelete(event) {
     event.preventDefault();
     Swal.fire({
@@ -196,7 +183,6 @@
     fetch(`/detail_invoice/api/${invoiceId}`)
       .then(response => response.json())
       .then(data => {
-      
         populateDetailInvoiceTable(data);
       })
       .catch(error => {
@@ -204,38 +190,34 @@
       });
   }
 
-function populateDetailInvoiceTable(details) {
-  const tbody = document.getElementById('detailInvoiceBody');
-  tbody.innerHTML = '';
-  console.log(
-    details
-  );
-  
-  details.forEach(detail => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td class="py-2 px-4 border-b">${detail.Nama_Barang || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Volume || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Qty || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Satuan || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Harga_Satuan || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Harga_Satuan_sn || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Jumlah || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Jumlah_sn || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Kondisi || ''}</td>
-      <td class="py-2 px-4 border-b text-center">
-        <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:underline mr-2">
-          <i class="fa fa-edit"></i>
-        </button>
-        <button onclick="deleteDetail(${detail.id})" class="text-red-600 hover:underline">
-          <i class="fa fa-trash"></i>
-        </button>
-      </td>
-    `;
-    tbody.appendChild(tr);
-  });
-}
-
+  function populateDetailInvoiceTable(details) {
+    const tbody = document.getElementById('detailInvoiceBody');
+    tbody.innerHTML = '';
+    console.log(details);
+    details.forEach(detail => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td class="py-2 px-4 border-b">${detail.Nama_Barang || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Volume || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Qty || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Satuan || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Harga_Satuan || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Harga_Satuan_sn || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Jumlah || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Jumlah_sn || ''}</td>
+        <td class="py-2 px-4 border-b">${detail.Kondisi || ''}</td>
+        <td class="py-2 px-4 border-b text-center">
+          <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:underline mr-2">
+            <i class="fa fa-edit"></i>
+          </button>
+          <button onclick="deleteDetail(${detail.id})" class="text-red-600 hover:underline">
+            <i class="fa fa-trash"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 
   function clearDetailInvoiceTable() {
     document.getElementById('detailInvoiceBody').innerHTML = '';
@@ -280,7 +262,7 @@ function populateDetailInvoiceTable(details) {
       Kondisi: document.getElementById('Kondisi').value,
       Invoice_id: invoiceId
     };
-    console.log(JSON.stringify(data));
+ 
 
     if (id) {
       // Update 
@@ -314,34 +296,36 @@ function populateDetailInvoiceTable(details) {
       });
     }
   }
-function syncQty() {
-  const volume = parseFloat(document.getElementById('Volume').value);
-  if (!isNaN(volume)) {
-    document.getElementById('Qty').value = volume;
-  } else {
-    document.getElementById('Qty').value = '';
-  }
-  calculateJumlah(); // Recalculate Jumlah if volume changes
-}
 
-function calculateJumlah() {
-  const qty = parseFloat(document.getElementById('Qty').value);
-  const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan').value);
-  if (!isNaN(qty) && !isNaN(hargaSatuan)) {
-    document.getElementById('Jumlah').value = qty * hargaSatuan;
-  } else {
-    document.getElementById('Jumlah').value = '';
+  function syncQty() {
+    const volume = parseFloat(document.getElementById('Volume').value);
+    if (!isNaN(volume)) {
+      document.getElementById('Qty').value = volume;
+    } else {
+      document.getElementById('Qty').value = '';
+    }
+    calculateJumlah(); // Recalculate Jumlah if volume changes
+    calculateJumlahNego(); // Recalculate Jumlah if volume changes
   }
-}
-function calculateJumlahNego() {
-  const qty = parseFloat(document.getElementById('Qty').value);
-  const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan_sn').value);
-  if (!isNaN(qty) && !isNaN(hargaSatuan)) {
-    document.getElementById('Jumlah_sn').value = qty * hargaSatuan;
-  } else {
-    document.getElementById('Jumlah_sn').value = '';
+
+  function calculateJumlah() {
+    const qty = parseFloat(document.getElementById('Qty').value);
+    const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan').value);
+    if (!isNaN(qty) && !isNaN(hargaSatuan)) {
+      document.getElementById('Jumlah').value = qty * hargaSatuan;
+    } else {
+      document.getElementById('Jumlah').value = '';
+    }
   }
-}
+  function calculateJumlahNego() {
+    const qty = parseFloat(document.getElementById('Qty').value);
+    const hargaSatuan = parseFloat(document.getElementById('Harga_Satuan_sn').value);
+    if (!isNaN(qty) && !isNaN(hargaSatuan)) {
+      document.getElementById('Jumlah_sn').value = qty * hargaSatuan;
+    } else {
+      document.getElementById('Jumlah_sn').value = '';
+    }
+  }
 
 
   function editDetail(id) {
@@ -393,5 +377,27 @@ function calculateJumlahNego() {
         });
       }
     });
+  }
+
+  function openFullDataModal(invoiceJson) {
+    const invoice = JSON.parse(invoiceJson);
+    console.log(invoice);
+    populateFullDataModal(invoice);
+    document.getElementById('fullDataModal').classList.remove('hidden');
+  }
+
+  function closeFullDataModal() {
+    document.getElementById('fullDataModal').classList.add('hidden');
+    document.getElementById('fullDataContent').innerHTML = '';
+  }
+
+  function populateFullDataModal(invoice) {
+    const container = document.getElementById('fullDataContent');
+    container.innerHTML = '';
+    for (const [key, value] of Object.entries(invoice)) {
+      const div = document.createElement('div');
+      div.innerHTML = `<strong>${key}:</strong> ${value}`;
+      container.appendChild(div);
+    }
   }
 </script>

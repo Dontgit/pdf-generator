@@ -418,11 +418,12 @@ exports.generateBOPSurat = async (req, res) => {
     page.drawText('PT. Mastah Digital Teknologi', { x: startX , y: startY, size: fontSize, font: fontBold });
     startY -= 15;
     page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontBold });
-
+    
     // Paragraf Pembuka
     startY -= 50;
     page.drawText(tanggalFormatted, { x: 425, y: 842 - height - 40, size: fontSize, font: fontRegular });
-    yPosition = startY;
+    page.drawText('Dengan Hormat,', { x: 100, y: startY, size: fontSize, font: fontRegular });
+    yPosition = startY - 15;
     var isi_surat = `Bersama surat ini kami ${costumer.Jabatan} dalam menunjang pengelolaan sekolah di sekolah kami, maka dengan ini kami memohon kepada Bapak/Ibu Direktur ${PT} untuk melakukan Pembelanjaan Barang dan Jasa BOP SMK Negeri 69 Jakarta. 
      \n\n Demikian permohonan ini kami sampaikan agar dapat Bapak/Ibu mengetahuinya dan segera menindaklanjuti, atas kerjasama yang baik kami ucapkan terima kasih. `;
     const paragraphs = isi_surat.split('\n\n'); // pisah paragraf dengan double line break
@@ -434,8 +435,8 @@ exports.generateBOPSurat = async (req, res) => {
     page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
 
     // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-    page.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
-    page.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
+    page.drawText(costumer.Nama, { x: 350, y: 50+ 18, size: fontSize, font: fontBold });
+    page.drawText(`NIP : ${costumer.NIP}`, { x: 350, y: 50 , size: fontSize, font: fontBold });
 
     // PAGE 2
     const page2 = pdfDoc.addPage([595, 842]); // A4
@@ -480,8 +481,8 @@ exports.generateBOPSurat = async (req, res) => {
     page2.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
 
     // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-    page2.drawText(costumer.Nama, { x: 375, y: 50+ 18, size: fontSize, font: fontBold });
-    page2.drawText(`NIP : ${costumer.NIP}`, { x: 375, y: 50 , size: fontSize, font: fontBold });
+    page2.drawText(costumer.Nama, { x: 350, y: 50+ 18, size: fontSize, font: fontBold });
+    page2.drawText(`NIP : ${costumer.NIP}`, { x: 350, y: 50 , size: fontSize, font: fontBold });
 
     // Kirim PDF
     const pdfBytes = await pdfDoc.save();
@@ -614,14 +615,14 @@ exports.generateSHP = async (req, res) => {
       namabarang: item.Nama_Barang || '',
       volume: item.Volume ? item.Volume.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
-      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
-      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan_sn) : '',
+      jumlah: item.Jumlah ? formatRupiah(item.Jumlah_sn) : '',
     }));  
     
     const summaryRows = [
-      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
-      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
-      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+      { label: 'Jumlah', value: formatRupiah(invoice.Total_sn) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN_sn) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga_sn) },
     ];
     // Draw table with summary
     startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
@@ -633,7 +634,7 @@ exports.generateSHP = async (req, res) => {
  
     page.drawText(costumer.Jabatan, { x: 350, y: 170-18, size: fontSize, font: fontBold });
     // Tulisan "Hormat kami" di bawah surat (misal di y=100)
-    page.drawText(costumer.Nama, { x: 375, y: 50, size: fontSize, font: fontBold });
+    page.drawText(costumer.Nama, { x: 350, y: 50, size: fontSize, font: fontBold });
 
 
 
@@ -756,7 +757,7 @@ exports.generateSPH = async (req, res) => {
     // Letter content
     let yPosition = startY- 20;
     page.drawText('Dengan hormat,', { x: startX, y: startY, size: fontSize, font: fontRegular });
-    const isi_surat = `Kami dari ${PT} bermaksud menanggapi Surat Permintaan Penawaran harga untuk ${invoice.Kegiatan} pada ${costumer.Sekolah}. Berikut kami sampaikan penawaran harga terbaik kami sebesar Rp ${formatRupiah(invoice.Total_Harga)} dengan rincian sebagai berikut :`;
+    const isi_surat = `Kami dari ${PT} bermaksud menanggapi Surat Permintaan Penawaran harga untuk ${invoice.Kegiatan} pada ${costumer.Sekolah}. Berikut kami sampaikan penawaran harga terbaik kami sebesar Rp ${formatRupiah(invoice.Total_Harga)} ,- *(${terbilangManual(invoice.Total_Harga)}) dengan rincian sebagai berikut :`;
     
     const paragraphs = isi_surat.split('\n\n');
     paragraphs.forEach(paragraph => {
@@ -771,8 +772,8 @@ exports.generateSPH = async (req, res) => {
       { header: 'Nama Barang', key: 'namabarang', width: 200 },
       { header: 'Volume', key: 'volume', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
-      { header: 'Harga Satuan', key: 'harga', width: 80 },
-      { header: 'Jumlah', key: 'jumlah', width: 60 },
+      { header: 'Harga Satuan', key: 'harga', width: 90 },
+      { header: 'Jumlah', key: 'jumlah', width: 90 },
     ];
 
     const rows = detail_invoice.map((item, idx) => ({
@@ -956,7 +957,7 @@ exports.generateDaftarHadir = async (req, res) => {
 
     // Footer
     startY -= 50;
-    page.drawText('Mengetahui,', { x: 350, y: startY, size: fontSize, font: fontRegular });
+    page.drawText('Pejabat Pelaksana Teknis Kegiatan', { x: 350, y: startY, size: fontSize, font: fontRegular });
     startY -= 15;
     page.drawText(costumer.Jabatan, { x: 350, y: startY, size: fontSize, font: fontRegular });
     startY -= 60;
@@ -1086,7 +1087,7 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
     startY -= 15;
     page.drawText(`${costumer.Alamat}`, { x: startX, y: startY, size: fontSize, font: fontRegular });
     startY -= 15;
-    page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontRegular });
+    // page.drawText('Di Padang', { x: startX, y: startY, size: fontSize, font: fontRegular });
     
     startY -= 15;
     
@@ -1110,7 +1111,7 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
 
     // Letter content
     let yPosition = startY -20;
-    const isi_surat = `Dengan ini kami menyetujui hasil negosiasi pada tanggal ${tanggalFormatted} perihal ${invoice.Kegiatan} , dengan harga awal penawaran Rp ${invoice.Total_Harga}, menjadi Rp ${invoice.Total_Harga},- dengan rincian sebagai berikut :`;
+    const isi_surat = `Dengan ini kami menyetujui hasil negosiasi pada tanggal ${tanggalFormatted} perihal ${invoice.Kegiatan} , dengan harga awal penawaran Rp ${formatRupiah(invoice.Total_Harga)} (${terbilangManual(invoice.Total_Harga)}), menjadi Rp ${formatRupiah(invoice.Total_Harga)} (${terbilangManual(invoice.Total_Harga)}) dengan rincian sebagai berikut :`;
     yPosition = drawParagraphJustify(page, isi_surat.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
     yPosition -= 10;
 
@@ -1119,11 +1120,11 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
     // Table
     const columns = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Nama Barang Pekerjaan', key: 'namabarang', width: 200 },
+      { header: 'Nama Barang Pekerjaan', key: 'namabarang', width: 180 },
       { header: 'Volume', key: 'volume', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
       { header: 'Harga Satuan', key: 'harga', width: 80 },
-      { header: 'Jumlah', key: 'jumlah', width: 60 },
+      { header: 'Jumlah', key: 'jumlah', width: 80 },
     ];
 
     const rows = detail_invoice.map((item, idx) => ({
@@ -1131,14 +1132,14 @@ exports.generatePersetujuanNegosiasi = async (req, res) => {
       namabarang: item.Nama_Barang || '',
       volume: item.Volume ? item.Volume.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
-      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
-      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+      harga: item.Harga_Satuan_sn ? formatRupiah(item.Harga_Satuan_sn) : '',
+      jumlah: item.Jumlah_sn ? formatRupiah(item.Jumlah_sn) : '',
     }));
 
     const summaryRows = [
-      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
-      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
-      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+      { label: 'Jumlah', value: formatRupiah(invoice.Total_sn) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN_sn) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga_sn) },
     ];
 
     startY = drawTableWithSummary(page, startX, yPosition, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
@@ -1314,11 +1315,11 @@ exports.generateSPK = async (req, res) => {
     // Table
     const columns = [
       { header: 'No', key: 'no', width: 30 },
-      { header: 'Nama Barang/Pekerjaan', key: 'namabarang', width: 200 },
+      { header: 'Nama Barang/Pekerjaan', key: 'namabarang', width: 160 },
       { header: 'Volume', key: 'volume', width: 60 },
       { header: 'Satuan', key: 'satuan', width: 60 },
       { header: 'Harga Satuan', key: 'harga', width: 80 },
-      { header: 'Jumlah', key: 'jumlah', width: 60 },
+      { header: 'Jumlah', key: 'jumlah', width: 80 },
     ];
 
     const rows = detail_invoice.map((item, idx) => ({
@@ -1326,21 +1327,21 @@ exports.generateSPK = async (req, res) => {
       namabarang: item.Nama_Barang || '',
       volume: item.Volume ? item.Volume.toString() : '',
       satuan: item.Satuan ? item.Satuan.toString() : '',
-      harga: item.Harga_Satuan ? formatRupiah(item.Harga_Satuan) : '',
-      jumlah: item.Jumlah ? formatRupiah(item.Jumlah) : '',
+      harga: item.Harga_Satuan_sn ? formatRupiah(item.Harga_Satuan_sn) : '',
+      jumlah: item.Jumlah_sn ? formatRupiah(item.Jumlah_sn) : '',
     }));
 
     const summaryRows = [
-      { label: 'Jumlah', value: formatRupiah(invoice.Total) },
-      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN) },
+      { label: 'Jumlah', value: formatRupiah(invoice.Total_sn) },
+      { label: 'PPN (11%)', value: formatRupiah(invoice.PPN_sn) },
       { label: 'Pengiriman', value: '-' },
       { label: 'Asuransi', value: '-' },
-      { label: 'Total', value: formatRupiah(invoice.Total_Harga) },
+      { label: 'Total', value: formatRupiah(invoice.Total_Harga_sn) },
     ];
 
     startY = drawTableWithSummary(page, startX, startY, columns, rows, summaryRows, fontRegular, fontBold, fontSize);
     startY -= 20;
-  const hasil = terbilangManual(invoice.Total_Harga)
+  const hasil = terbilangManual(invoice.Total_Harga_sn)
     drawDetailLine('Terbilang', hasil , startY,startX,);
     startY -= 15;
     page.drawLine({
@@ -1471,7 +1472,8 @@ exports.generateUndanganNegosiasi = async (req, res) => {
 
           page.drawText('Kepada', { x: startX + 250, y: startY, size: fontSize, font: fontRegular });
      startY -= 15;
-
+      page.drawText(`Yth. ${JabatanPT} ${PT}`, { x: startX + 250, y: startY, size: fontSize, font: fontRegular });
+     startY -= 15;
     const paragraphs = AlamatKantor.split('\n\n'); // pisah paragraf dengan double line break
     paragraphs.forEach(paragraph => {
           page.drawText(paragraph, { x: startX + 250, y: startY, size: fontSize, font: fontRegular });
@@ -1678,7 +1680,7 @@ exports.generateSuratKesanggupanMelaksanakan = async (req, res) => {
     yPosition -= 20;
 
     // Main commitment text
-    const commitmentText = `Dengan ini menyatakan kesanggupan untuk melaksanakan pekerjaan ${invoice.Kegiatan} pada ${costumer.Sekolah} dengan nilai kontrak sebesar Rp ${formatRupiah(invoice.Total_Harga)} (${terbilangManual(invoice.Total_Harga)}) .`;
+    const commitmentText = `Dengan ini menyatakan kesanggupan untuk melaksanakan pekerjaan ${invoice.Kegiatan} pada ${costumer.Sekolah} dengan nilai kontrak sebesar Rp ${formatRupiah(invoice.Total_Harga_sn)} (${terbilangManual(invoice.Total_Harga_sn)}) .`;
     
     yPosition = drawParagraphJustify(page, commitmentText.trim(), startX, yPosition, 450, 18, fontRegular, fontSize);
     yPosition -= 30;
