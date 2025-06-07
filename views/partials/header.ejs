@@ -14,25 +14,30 @@
   <!-- SweetAlert2 -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-gray-100 min-h-screen p-4">
-  <div class="container mx-auto">
-    <nav class="bg-white shadow rounded mb-6">
-      <div class="max-w-7xl mx-auto px-4">
-        <div class="flex justify-between h-16">
-          <div class="flex">
-            <a href="/costumer" class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">
-              Costumer
-            </a>
-            <a href="/invoice" class="ml-4 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">
-              Invoice
-            </a>
-            <a href="/pphp" class="ml-4 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">
-              PPHP
-            </a>
-               <a href="/generate" class="ml-4 inline-flex items-center px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-100">
-              Generate
-            </a>
-          </div>
-        </div>
-      </div>
-    </nav>
+<body class="bg-gray-100 min-h-screen flex">
+
+<nav class="fixed top-0 left-0 z-40 w-64 h-full pt-20 bg-white border-r border-gray-200 overflow-y-auto">
+  <ul class="space-y-2 px-3">
+    <li>
+      <a href="/costumer" class="flex items-center p-2 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition">
+        <i class="fa fa-users mr-3"></i> Costumer
+      </a>
+    </li>
+    <li>
+      <a href="/invoice" class="flex items-center p-2 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition">
+        <i class="fa fa-file-invoice mr-3"></i> Invoice
+      </a>
+    </li>
+    <li>
+      <a href="/pphp" class="flex items-center p-2 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition">
+        <i class="fa fa-file-alt mr-3"></i> PPHP
+      </a>
+    </li>
+    <li>
+      <a href="/generate" class="flex items-center p-2 text-base font-medium text-gray-700 rounded-lg hover:bg-gray-100 hover:text-blue-600 transition">
+        <i class="fa fa-cogs mr-3"></i> Generate
+      </a>
+    </li>
+  </ul>
+</nav>
+<div class="flex-1 min-h-screen pt-20 pl-0 md:pl-64 p-4">

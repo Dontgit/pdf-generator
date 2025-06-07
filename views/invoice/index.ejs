@@ -1,60 +1,61 @@
-
+ 
 
 <%- include('../partials/header') %>
-<div class="flex justify-between items-center mb-4">
-  <h1 class="text-2xl font-bold">Invoice List</h1>
-  <a href="/invoice/new" class="btn btn-primary bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-    <i class="fa fa-plus"></i> Add New
+<div class="flex flex-col md:flex-row justify-between items-center mb-6">
+  <h1 class="text-3xl font-extrabold text-gray-900 mb-4 md:mb-0">Invoice List</h1>
+  <a href="/invoice/new" class="inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
+    <i class="fa fa-plus mr-2"></i> Add New
   </a>
 </div>
 
-<table class="min-w-full bg-white rounded shadow">
-  <thead>
-    <tr>
-      <th class="py-2 px-4 border-b">ID</th>
-      <th class="py-2 px-4 border-b">Kegiatan</th>
-      <th class="py-2 px-4 border-b">Sekolah</th>
-      <th class="py-2 px-4 border-b">Total</th>
-      <th class="py-2 px-4 border-b">PPN</th>
-      <th class="py-2 px-4 border-b">Total Harga</th>
-      <th class="py-2 px-4 border-b">Total Setelah Nego</th>
-      <th class="py-2 px-4 border-b">PPN Setelah Nego</th>
-      <th class="py-2 px-4 border-b">Total Harga Setelah Nego</th>
-      <th class="py-2 px-4 border-b">Costumer ID</th>
-      <th class="py-2 px-4 border-b">Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% invoices.forEach(invoice => { %>
+<div class="overflow-x-auto bg-white rounded-lg shadow">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
       <tr>
-        <td class="py-2 px-4 border-b"><%= invoice.id %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.Kegiatan %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.Sekolah %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.Total %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.PPN %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.Total_Harga %></td>
-                <td class="py-2 px-4 border-b"><%= invoice.Total_sn %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.PPN_sn %></td>
-        <td class="py-2 px-4 border-b"><%= invoice.Total_Harga_sn %></td>
-
-        <td class="py-2 px-4 border-b"><%= invoice.Costumer_id %></td>
-        <td class="py-2 px-4 border-b">
-          <button onclick="openDetailModal(<%= invoice.id %>)" class="text-green-600 hover:underline mr-2" title="View Details">
-            <i class="fa fa-list"></i>
-          </button>
-          <a href="/invoice/<%= invoice.id %>/edit" class="text-blue-600 hover:underline mr-2" title="Edit Invoice">
-            <i class="fa fa-edit"></i>
-          </a>
-          <form action="/invoice/<%= invoice.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)">
-            <button type="submit" class="text-red-600 hover:underline" title="Delete Invoice">
-              <i class="fa fa-trash"></i>
-            </button>
-          </form>
-        </td>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kegiatan</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PPN</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Setelah Nego</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PPN Setelah Nego</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Harga Setelah Nego</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Costumer ID</th>
+        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
       </tr>
-    <% }) %>
-  </tbody>
-</table>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% invoices.forEach(invoice => { %>
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.id %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Kegiatan %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Sekolah %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.PPN %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_sn %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.PPN_sn %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Total_Harga_sn %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= invoice.Costumer_id %></td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
+            <button onclick="openDetailModal(<%= invoice.id %>)" class="text-green-600 hover:text-green-900" title="View Details">
+              <i class="fa fa-list"></i>
+            </button>
+            <a href="/invoice/<%= invoice.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit Invoice">
+              <i class="fa fa-edit"></i>
+            </a>
+            <form action="/invoice/<%= invoice.id %>/delete" method="POST" onsubmit="return confirmDelete(event)">
+              <button type="submit" class="text-red-600 hover:text-red-900" title="Delete Invoice">
+                <i class="fa fa-trash"></i>
+              </button>
+            </form>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+</div>
 
 <!-- Detail Invoice Modal -->
 <div id="detailModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
@@ -66,72 +67,72 @@
       </button>
     </div>
     <div>
-      <table class="min-w-full bg-white rounded shadow mb-4">
-        <thead>
+      <table class="min-w-full divide-y divide-gray-200 mb-4">
+        <thead class="bg-gray-50">
           <tr>
-            <th class="py-2 px-4 border-b">Nama Barang</th>
-            <th class="py-2 px-4 border-b">Volume</th>
-            <th class="py-2 px-4 border-b">Qty</th>
-            <th class="py-2 px-4 border-b">Satuan</th>
-            <th class="py-2 px-4 border-b">Harga Satuan</th>
-            <th class="py-2 px-4 border-b">Harga Satuan SN</th>
-            <th class="py-2 px-4 border-b">Jumlah</th>
-            <th class="py-2 px-4 border-b">Total SN</th>
-            <th class="py-2 px-4 border-b">Kondisi</th>
-            <th class="py-2 px-4 border-b">Actions</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Barang</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Volume</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Qty</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Satuan</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga Satuan</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Harga Satuan SN</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jumlah</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total SN</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kondisi</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody id="detailInvoiceBody">
+        <tbody id="detailInvoiceBody" class="bg-white divide-y divide-gray-200">
           <!-- Detail invoice rows will be dynamically inserted here -->
         </tbody>
       </table>
-      <button onclick="showAddDetailForm()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 mb-4">
+      <button onclick="showAddDetailForm()" class="bg-blue-600 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-700 mb-4 transition">
         Add Detail
       </button>
-      <form id="addDetailForm" class="space-y-2 hidden">
+      <form id="addDetailForm" class="space-y-4 hidden">
         <input type="hidden" id="detailInvoiceId" />
         <input type="hidden" id="detailInvoiceInvoiceId" />
         <div>
-          <label for="Nama_Barang" class="block font-medium">Nama Barang</label>
-          <input type="text" id="Nama_Barang" class="w-full border rounded px-3 py-2" />
+          <label for="Nama_Barang" class="block font-medium text-gray-700">Nama Barang</label>
+          <input type="text" id="Nama_Barang" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div>
-          <label for="Volume" class="block font-medium">Volume</label>
-          <input type="number" id="Volume" class="w-full border rounded px-3 py-2" oninput="syncQty()" />
+          <label for="Volume" class="block font-medium text-gray-700">Volume</label>
+          <input type="number" id="Volume" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="syncQty()" />
         </div>
         <div>
-          <label for="Qty" class="block font-medium">Qty</label>
-          <input type="number" id="Qty" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+          <label for="Qty" class="block font-medium text-gray-700">Qty</label>
+          <input type="number" id="Qty" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly />
         </div>
         <div>
-          <label for="Satuan" class="block font-medium">Satuan</label>
-          <input type="text" id="Satuan" class="w-full border rounded px-3 py-2" />
+          <label for="Satuan" class="block font-medium text-gray-700">Satuan</label>
+          <input type="text" id="Satuan" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
         <div>
-          <label for="Harga_Satuan" class="block font-medium">Harga Satuan</label>
-          <input type="number" id="Harga_Satuan" class="w-full border rounded px-3 py-2" oninput="calculateJumlah()" />
+          <label for="Harga_Satuan" class="block font-medium text-gray-700">Harga Satuan</label>
+          <input type="number" id="Harga_Satuan" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="calculateJumlah()" />
         </div>
         <div>
-          <label for="Jumlah" class="block font-medium">Jumlah</label>
-          <input type="number" id="Jumlah" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+          <label for="Jumlah" class="block font-medium text-gray-700">Jumlah</label>
+          <input type="number" id="Jumlah" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly />
         </div>
         <div>
-          <label for="Harga_Satuan_sn" class="block font-medium">Harga Satuan Setelah Nego</label>
-          <input type="number" id="Harga_Satuan_sn" class="w-full border rounded px-3 py-2" oninput="calculateJumlahNego()" />
+          <label for="Harga_Satuan_sn" class="block font-medium text-gray-700">Harga Satuan Setelah Nego</label>
+          <input type="number" id="Harga_Satuan_sn" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" oninput="calculateJumlahNego()" />
         </div>
         <div>
-          <label for="Jumlah_sn" class="block font-medium">Jumlah Setelah Nego</label>
-          <input type="number" id="Jumlah_sn" class="w-full border rounded px-3 py-2 bg-gray-100" readonly />
+          <label for="Jumlah_sn" class="block font-medium text-gray-700">Jumlah Setelah Nego</label>
+          <input type="number" id="Jumlah_sn" class="w-full border border-gray-300 rounded-md px-3 py-2 bg-gray-100" readonly />
         </div>
         <div>
-          <label for="Kondisi" class="block font-medium">Kondisi</label>
-          <input type="text" id="Kondisi" class="w-full border rounded px-3 py-2" />
+          <label for="Kondisi" class="block font-medium text-gray-700">Kondisi</label>
+          <input type="text" id="Kondisi" class="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" />
         </div>
-        <div>
-          <button type="button" onclick="submitDetailForm()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        <div class="flex space-x-2">
+          <button type="button" onclick="submitDetailForm()" class="bg-green-600 text-white px-4 py-2 rounded-lg shadow hover:bg-green-700 transition">
             Save
           </button>
-          <button type="button" onclick="hideAddDetailForm()" class="ml-2 bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">
+          <button type="button" onclick="hideAddDetailForm()" class="bg-gray-600 text-white px-4 py-2 rounded-lg shadow hover:bg-gray-700 transition">
             Cancel
           </button>
         </div>
@@ -196,20 +197,20 @@ function populateDetailInvoiceTable(details) {
   details.forEach(detail => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
-      <td class="py-2 px-4 border-b">${detail.Nama_Barang || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Volume || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Qty || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Satuan || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Harga_Satuan || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Harga_Satuan_sn || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Jumlah || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Jumlah_sn || ''}</td>
-      <td class="py-2 px-4 border-b">${detail.Kondisi || ''}</td>
-      <td class="py-2 px-4 border-b text-center">
-        <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:underline mr-2">
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Nama_Barang || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Volume || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Qty || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Satuan || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Harga_Satuan || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Harga_Satuan_sn || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Jumlah || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Jumlah_sn || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${detail.Kondisi || ''}</td>
+      <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium space-x-2">
+        <button onclick="editDetail(${detail.id})" class="text-blue-600 hover:text-blue-900" title="Edit">
           <i class="fa fa-edit"></i>
         </button>
-        <button onclick="deleteDetail(${detail.id})" class="text-red-600 hover:underline">
+        <button onclick="deleteDetail(${detail.id})" class="text-red-600 hover:text-red-900" title="Delete">
           <i class="fa fa-trash"></i>
         </button>
       </td>
@@ -341,40 +342,3 @@ function calculateJumlahNego() {
           document.getElementById('Qty').value = detail.Qty;
           document.getElementById('Satuan').value = detail.Satuan;
           document.getElementById('Harga_Satuan').value = detail.Harga_Satuan;
-          document.getElementById('Jumlah').value = detail.Jumlah;
-          document.getElementById('Harga_Satuan_sn').value = detail.Harga_Satuan_sn;
-          document.getElementById('Jumlah_sn').value = detail.Jumlah_sn;
-          document.getElementById('Kondisi').value = detail.Kondisi;
-        }
-      })
-      .catch(error => {
-        console.error('Error fetching detail for edit:', error);
-      });
-  }
-
-  function deleteDetail(id) {
-    Swal.fire({
-      title: 'Are you sure?',
-      text: "This will delete the detail invoice item.",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#d33',
-      cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
-    }).then((result) => {
-      if (result.isConfirmed) {
-        fetch(`/detail_invoice/api/${id}`, {
-          method: 'DELETE'
-        })
-        .then(response => response.json())
-        .then(() => {
-          loadDetailInvoice(currentInvoiceId);
-        })
-        .catch(error => {
-          console.error('Error deleting detail:', error);
-        });
-      }
-    });
-  }
-</script>
-<%- include('../partials/footer') %>
