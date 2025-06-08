@@ -1,36 +1,106 @@
 <%- include('../partials/header') %>
-<h1 class="text-2xl font-bold mb-4">Add New Costumer</h1>
 
-<form action="/costumer" method="POST" enctype="multipart/form-data" class="space-y-4 max-w-lg">
-  <div>
-    <label for="kop_surat" class="block font-medium">Kop Surat</label>
-    <input type="file" name="kop_surat" id="kop_surat" class="w-full border rounded px-3 py-2" />
+<!-- 
+  Desain Halaman Tambah Costumer Baru.
+  Mengadopsi tata letak modern yang konsisten dengan halaman edit untuk pengalaman pengguna yang seragam.
+-->
+<div class="max-w-4xl mx-auto">
+  <!-- Header Halaman -->
+  <div class="border-b border-gray-200 pb-4 mb-8">
+    <h1 class="text-4xl font-extrabold text-gray-900">Add New Costumer</h1>
+    <p class="mt-2 text-lg text-gray-600">Isi detail di bawah ini untuk membuat data pelanggan baru.</p>
   </div>
-  <div>
-    <label for="Jabatan" class="block font-medium">Jabatan</label>
-    <input type="text" name="Jabatan" id="Jabatan" class="w-full border rounded px-3 py-2" />
+
+  <!-- Form Container -->
+  <div class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-200">
+    <form action="/costumer" method="POST" enctype="multipart/form-data" class="space-y-6">
+      
+      <!-- Bagian Upload Kop Surat -->
+      <div>
+        <label class="block mb-2 text-sm font-medium text-gray-700">Kop Surat</label>
+        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
+          <div class="space-y-1 text-center">
+            <!-- Pratinjau gambar akan muncul di sini, awalnya tersembunyi -->
+            <img id="imagePreview" src="" alt="Image preview" class="hidden mx-auto mb-4 max-h-32 object-contain">
+            <!-- Ikon upload, terlihat saat belum ada gambar dipilih -->
+            <div id="uploadIcon" class="mx-auto h-12 w-12 text-gray-400">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                    <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </div>
+            <div class="flex text-sm text-gray-600 justify-center">
+              <label for="kop_surat" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                <span>Upload a file</span>
+                <input id="kop_surat" name="kop_surat" type="file" class="sr-only" onchange="previewImage(event)">
+              </label>
+              <p class="pl-1">or drag and drop</p>
+            </div>
+            <p class="text-xs text-gray-500" id="fileName">PNG, JPG, GIF up to 10MB</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid untuk input fields -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label for="Jabatan" class="block text-sm font-medium text-gray-700">Jabatan</label>
+          <input type="text" name="Jabatan" id="Jabatan" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+          <label for="Nama" class="block text-sm font-medium text-gray-700">Nama <span class="text-red-600">*</span></label>
+          <input type="text" name="Nama" id="Nama" required class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+          <label for="NIP" class="block text-sm font-medium text-gray-700">NIP</label>
+          <input type="text" name="NIP" id="NIP" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        <div>
+          <label for="Sekolah" class="block text-sm font-medium text-gray-700">Sekolah</label>
+          <input type="text" name="Sekolah" id="Sekolah" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+      </div>
+
+      <!-- Alamat -->
+      <div>
+        <label for="Alamat" class="block text-sm font-medium text-gray-700">Alamat</label>
+        <textarea name="Alamat" id="Alamat" rows="4" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"></textarea>
+      </div>
+
+      <!-- Tombol Aksi -->
+      <div class="pt-5 border-t border-gray-200 flex items-center justify-end gap-x-4">
+        <a href="/costumer" class="text-sm font-semibold text-gray-600 hover:text-gray-800">Cancel</a>
+        <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Save Costumer
+        </button>
+      </div>
+    </form>
   </div>
-  <div>
-    <label for="Nama" class="block font-medium">Nama <span class="text-red-600">*</span></label>
-    <input type="text" name="Nama" id="Nama" required class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="NIP" class="block font-medium">NIP</label>
-    <input type="text" name="NIP" id="NIP" class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="Sekolah" class="block font-medium">Sekolah</label>
-    <input type="text" name="Sekolah" id="Sekolah" class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="Alamat" class="block font-medium">Alamat</label>
-    <textarea name="Alamat" id="Alamat" rows="3" class="w-full border rounded px-3 py-2"></textarea>
-  </div>
-  <div>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Save
-    </button>
-    <a href="/costumer" class="ml-4 text-gray-600 hover:underline">Cancel</a>
-  </div>
-</form>
+</div>
+
+<script>
+  function previewImage(event) {
+    const reader = new FileReader();
+    const imagePreview = document.getElementById('imagePreview');
+    const uploadIcon = document.getElementById('uploadIcon');
+    const fileNameEl = document.getElementById('fileName');
+    
+    reader.onload = function(){
+      imagePreview.src = reader.result;
+      imagePreview.classList.remove('hidden');
+      uploadIcon.classList.add('hidden');
+    };
+    
+    if (event.target.files[0]) {
+      reader.readAsDataURL(event.target.files[0]);
+      fileNameEl.textContent = event.target.files[0].name;
+    } else {
+      // Jika user membatalkan pilihan, sembunyikan pratinjau dan tampilkan ikon lagi
+      imagePreview.classList.add('hidden');
+      uploadIcon.classList.remove('hidden');
+      fileNameEl.textContent = 'PNG, JPG, GIF up to 10MB';
+      imagePreview.src = '';
+    }
+  }
+</script>
+
 <%- include('../partials/footer') %>

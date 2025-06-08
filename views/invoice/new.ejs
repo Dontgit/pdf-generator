@@ -1,41 +1,66 @@
 <%- include('../partials/header') %>
-<h1 class="text-2xl font-bold mb-4">Add New Invoice</h1>
 
-<form action="/invoice" method="POST" class="space-y-4 max-w-lg">
-  <div>
-    <label for="Kegiatan" class="block font-medium">Kegiatan <span class="text-red-600">*</span></label>
-    <input type="text" name="Kegiatan" id="Kegiatan" required class="w-full border rounded px-3 py-2" />
-  </div>
-  <div>
-    <label for="Sekolah" class="block font-medium">Sekolah</label>
-    <input type="text" name="Sekolah" id="Sekolah" class="w-full border rounded px-3 py-2" />
+<!-- 
+  Desain Halaman Tambah Invoice Baru.
+  Fokus pada tata letak yang bersih dan pengalaman pengguna yang konsisten.
+-->
+<div class="max-w-4xl mx-auto">
+  <!-- Header Halaman -->
+  <div class="border-b border-gray-200 pb-4 mb-8">
+    <h1 class="text-4xl font-extrabold text-gray-900">Add New Invoice</h1>
+    <p class="mt-2 text-lg text-gray-600">Isi detail di bawah ini untuk membuat invoice baru.</p>
   </div>
 
-  <input type="hidden" step="0.01" value="0"  name="Total" id="Total" class="w-full border rounded px-3 py-2" />
-  <input type="hidden" step="0.01" value="0" name="PPN" id="PPN" class="w-full border rounded px-3 py-2" readonly />
-  <input type="hidden" step="0.01" value="0" name="Total_Harga" id="Total_Harga" class="w-full border rounded px-3 py-2" readonly />
-    <input type="hidden" step="0.01" value="0" name="Total_sn" id="Total_sn" class="w-full border rounded px-3 py-2" />
-  
-    <input type="hidden" step="0.01" value="0" name="PPN_sn" id="PPN_sn" class="w-full border rounded px-3 py-2" />
-  
-    <input type="hidden" step="0.01" value="0" name="Total_Harga_sn" id="Total_Harga_sn" class="w-full border rounded px-3 py-2" />
-  
-  <div>
-    <label for="Costumer_id" class="block font-medium">Costumer</label>
-    <select name="Costumer_id" id="Costumer_id" class="w-full border rounded px-3 py-2">
-      <option value="">-- Select Costumer --</option>
-      <% if (typeof costumers !== 'undefined') { %>
-        <% costumers.forEach(costumer => { %>
-          <option value="<%= costumer.id %>"><%= costumer.Nama %></option>
-        <% }) %>
-      <% } %>
-    </select>
+  <!-- Form Container -->
+  <div class="bg-white p-6 md:p-8 rounded-xl shadow-md border border-gray-200">
+    <form action="/invoice" method="POST" class="space-y-6">
+      
+      <!-- Grid untuk input fields -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-6">
+        <!-- Kegiatan (mengambil lebar penuh) -->
+        <div class="md:col-span-2">
+          <label for="Kegiatan" class="block text-sm font-medium text-gray-700">Kegiatan <span class="text-red-600">*</span></label>
+          <input type="text" name="Kegiatan" id="Kegiatan" required class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+        
+        <!-- Sekolah -->
+        <div>
+          <label for="Sekolah" class="block text-sm font-medium text-gray-700">Sekolah</label>
+          <input type="text" name="Sekolah" id="Sekolah" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+        </div>
+
+        <!-- Costumer -->
+        <div>
+          <label for="Costumer_id" class="block text-sm font-medium text-gray-700">Costumer</label>
+          <select name="Costumer_id" id="Costumer_id" class="mt-1 block w-full px-4 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+            <option value="">-- Select Costumer --</option>
+            <% if (typeof costumers !== 'undefined' && costumers.length) { %>
+              <% costumers.forEach(costumer => { %>
+                <option value="<%= costumer.id %>"><%= costumer.Nama %> (<%= costumer.Sekolah %>)</option>
+              <% }) %>
+            <% } %>
+          </select>
+        </div>
+      </div>
+
+      <!-- Input Tersembunyi untuk Data Harga -->
+      <!-- Nilai-nilai ini diatur ke 0 secara default untuk invoice baru. -->
+      <input type="hidden" value="0" name="Total" />
+      <input type="hidden" value="0" name="PPN" />
+      <input type="hidden" value="0" name="Total_Harga" />
+      <input type="hidden" value="0" name="Total_sn" />
+      <input type="hidden" value="0" name="PPN_sn" />
+      <input type="hidden" value="0" name="Total_Harga_sn" />
+      
+      <!-- Tombol Aksi -->
+      <div class="pt-5 border-t border-gray-200 flex items-center justify-end gap-x-4">
+        <a href="/invoice" class="text-sm font-semibold text-gray-600 hover:text-gray-800">Cancel</a>
+        <button type="submit" class="inline-flex justify-center py-2 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+          Save Invoice
+        </button>
+      </div>
+    </form>
   </div>
-  <div>
-    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-      Save
-    </button>
-    <a href="/invoice" class="ml-4 text-gray-600 hover:underline">Cancel</a>
-  </div>
-</form>
+</div>
+
 <%- include('../partials/footer') %>

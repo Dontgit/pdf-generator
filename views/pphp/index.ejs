@@ -1,95 +1,138 @@
 <%- include('../partials/header') %>
 
-<div class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="flex flex-col sm:flex-row justify-between items-center mb-6">
-    <h1 class="text-3xl font-extrabold text-gray-900 mb-4 sm:mb-0">PPHP List</h1>
-    <a href="/pphp/new" class="inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
-      <i class="fa fa-plus mr-2" aria-hidden="true"></i>
-      Add New PPHP
+<div class="max-w-7xl mx-auto">
+  <!-- Header Halaman dan Tombol Aksi -->
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-900">PPHP List</h1>
+      <p class="mt-1 text-gray-600">Kelola semua data Panitia Penerima Hasil Pekerjaan (PPHP).</p>
+    </div>
+    <a href="/pphp/new" class="w-full md:w-auto inline-flex items-center justify-center bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105">
+      <i class="fa fa-plus mr-2"></i> Add New PPHP
     </a>
   </div>
 
-  <% if (pphps.length > 0) { %>
-    <div class="overflow-x-auto rounded-lg shadow-md border border-gray-200">
-      <table class="min-w-full divide-y divide-gray-200 bg-white">
-        <thead class="bg-gray-100">
-          <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">ID</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Nama</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">NIP</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">NIKKI</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Invoice ID</th>
-            <th scope="col" class="relative px-6 py-3">
-              <span class="sr-only">Actions</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200">
+  <!-- Bilah Pencarian -->
+  <div class="mb-4">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa fa-search text-gray-400"></i>
+      </div>
+      <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari berdasarkan nama, NIP, atau Invoice ID..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm">
+    </div>
+  </div>
+
+  <!-- Tabel PPHP -->
+  <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+    <table id="pphpTable" class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIP</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIKKI</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Invoice ID</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <% if (pphps.length > 0) { %>
           <% pphps.forEach(pphp => { %>
-            <tr class="hover:bg-gray-50 transition-colors duration-150 ease-in-out">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= pphp.id %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= pphp.Nama %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= pphp.NIP %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= pphp.NIKKI %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800"><%= pphp.Invoice_id %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-4">
-                <a href="/pphp/<%= pphp.id %>/edit" class="text-blue-600 hover:text-blue-800 transition-colors duration-150" aria-label="Edit <%= pphp.Nama %>" title="Edit <%= pphp.Nama %>">
-                  <i class="fa fa-edit fa-fw"></i>
-                </a>
-                <form action="/pphp/<%= pphp.id %>/delete" method="POST" class="inline" onsubmit="return confirmDelete(event)" aria-label="Delete <%= pphp.Nama %>">
-                  <button type="submit" class="text-red-600 hover:text-red-800 focus:outline-none transition-colors duration-150" aria-label="Delete <%= pphp.Nama %>" title="Delete <%= pphp.Nama %>">
-                    <i class="fa fa-trash fa-fw"></i>
-                  </button>
-                </form>
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium"><%= pphp.Nama %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= pphp.NIP %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= pphp.NIKKI %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= pphp.Invoice_id %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center justify-center space-x-4">
+                  <a href="/pphp/<%= pphp.id %>/edit" class="text-blue-600 hover:text-blue-800 transition" title="Edit <%= pphp.Nama %>">
+                    <i class="fa fa-edit fa-fw text-lg"></i>
+                  </a>
+                  <form action="/pphp/<%= pphp.id %>/delete" method="POST" class="inline" onsubmit="confirmDelete(event, '<%= pphp.Nama %>')">
+                    <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Delete <%= pphp.Nama %>">
+                      <i class="fa fa-trash fa-fw text-lg"></i>
+                    </button>
+                  </form>
+                </div>
               </td>
             </tr>
           <% }) %>
-        </tbody>
-      </table>
-    </div>
-  <% } else { %>
-    <div class="text-center py-12 px-6 bg-white rounded-lg shadow-md border border-gray-200">
-      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
-      </svg>
-      <h3 class="mt-2 text-xl font-semibold text-gray-800">No PPHP Records Found</h3>
-      <p class="mt-1 text-sm text-gray-500">
-        There are currently no PPHP records to display. Get started by adding a new one.
-      </p>
-      <div class="mt-6">
-        <a href="/pphp/new" class="inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-md shadow hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition">
-          <i class="fa fa-plus mr-2" aria-hidden="true"></i>
-          Add New PPHP
-        </a>
-      </div>
-    </div>
-  <% } %>
+        <% } else { %>
+          <tr id="no-data-row">
+            <td colspan="5" class="text-center py-10 px-4">
+              <div class="flex flex-col items-center">
+                <i class="fa-solid fa-file-circle-question fa-3x text-gray-400 mb-3"></i>
+                <p class="text-gray-500 text-lg">Belum ada data PPHP.</p>
+                <p class="text-gray-400 text-sm">Tambahkan data PPHP baru untuk memulai.</p>
+              </div>
+            </td>
+          </tr>
+        <% } %>
+        <tr id="no-results-row" class="hidden">
+          <td colspan="5" class="text-center py-10 px-4">
+            <div class="flex flex-col items-center">
+              <i class="fa fa-search fa-3x text-gray-400 mb-3"></i>
+              <p class="text-gray-500 text-lg">Data PPHP tidak ditemukan.</p>
+              <p class="text-gray-400 text-sm">Coba kata kunci pencarian yang lain.</p>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-  function confirmDelete(event) {
-    // event.preventDefault(); // Prevent form submission immediately
-    // The onsubmit="return confirmDelete(event)" already handles this by returning true/false
-    // or by SweetAlert taking over the submission flow.
-    // For SweetAlert, we need to prevent default initially and then submit programmatically.
-    event.preventDefault(); 
-
+  function confirmDelete(event, pphpName) {
+    event.preventDefault(); // Mencegah form dari submit secara langsung
     Swal.fire({
-      title: 'Are you sure?',
-      text: "This will delete the PPHP record. This action cannot be undone.",
+      title: 'Apakah Anda yakin?',
+      html: `Anda akan menghapus data PPHP: <strong>${pphpName}</strong>. <br/>Aksi ini tidak dapat dibatalkan.`,
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#d33', // Red for delete
-      cancelButtonColor: '#3085d6', // Blue for cancel
-      confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel'
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
     }).then((result) => {
       if (result.isConfirmed) {
-        // If confirmed, submit the form that triggered the event
+        // Jika dikonfirmasi, submit formnya
         event.target.submit();
       }
     });
-    return false; // Redundant if event.preventDefault() is called, but good practice.
+  }
+
+  function searchTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById('pphpTable');
+    const tr = table.getElementsByTagName('tr');
+    const noResultsRow = document.getElementById('no-results-row');
+    const noDataRow = document.getElementById('no-data-row');
+    let dataRowsFound = 0;
+
+    for (let i = 1; i < tr.length; i++) { // Mulai dari 1 untuk melewati header
+      if (tr[i].id.includes('row')) continue; // Lewati baris no-data/no-results
+
+      let rowVisible = false;
+      const td = tr[i].getElementsByTagName('td');
+      for (let j = 0; j < td.length - 1; j++) { // Loop kolom data, lewati kolom action
+        if (td[j] && td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+          rowVisible = true;
+          break;
+        }
+      }
+      tr[i].style.display = rowVisible ? '' : 'none';
+      if (rowVisible) dataRowsFound++;
+    }
+    
+    // Tampilkan pesan "tidak ditemukan" jika tidak ada baris yang cocok
+    if (noResultsRow) {
+        noResultsRow.style.display = (dataRowsFound === 0 && <% pphps.length > 0 %>) ? '' : 'none';
+    }
+    // Sembunyikan pesan "no data" jika sedang mencari
+    if (noDataRow) {
+        noDataRow.style.display = (<% pphps.length === 0 %> && filter === '') ? '' : 'none';
+    }
   }
 </script>
 

@@ -1,63 +1,136 @@
 <%- include('../partials/header') %>
-<div class="flex flex-col md:flex-row justify-between items-center mb-6">
-  <h1 class="text-3xl font-extrabold text-gray-900 mb-4 md:mb-0">Customer List</h1>
-  <a href="/costumer/new" class="inline-flex items-center bg-blue-600 text-white px-5 py-2 rounded-lg shadow hover:bg-blue-700 transition">
-    <i class="fa fa-plus mr-2"></i> Add New
-  </a>
-</div>
 
-<div class="overflow-x-auto bg-white rounded-lg shadow">
-  <table class="min-w-full divide-y divide-gray-200">
-    <thead class="bg-gray-50">
-      <tr>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
-        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-      </tr>
-    </thead>
-    <tbody class="bg-white divide-y divide-gray-200">
-      <% costumers.forEach(costumer => { %>
+<div class="max-w-7xl mx-auto">
+  <!-- Header Halaman dan Tombol Aksi -->
+  <div class="flex flex-col md:flex-row justify-between items-center gap-4 mb-6">
+    <div>
+      <h1 class="text-3xl font-extrabold text-gray-900">Customer List</h1>
+      <p class="mt-1 text-gray-600">Kelola semua data pelanggan Anda di satu tempat.</p>
+    </div>
+    <a href="/costumer/new" class="w-full md:w-auto inline-flex items-center justify-center bg-blue-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-blue-700 transition-transform transform hover:scale-105">
+      <i class="fa fa-plus mr-2"></i> Add New Customer
+    </a>
+  </div>
+
+  <!-- Bilah Pencarian -->
+  <div class="mb-4">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <i class="fa fa-search text-gray-400"></i>
+      </div>
+      <input type="text" id="searchInput" onkeyup="searchTable()" placeholder="Cari berdasarkan nama, jabatan, atau sekolah..." class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm shadow-sm">
+    </div>
+  </div>
+
+  <!-- Tabel Customer -->
+  <div class="overflow-x-auto bg-white rounded-lg shadow-lg">
+    <table id="customerTable" class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
         <tr>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Nama %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Jabatan %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= costumer.Sekolah %></td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium flex space-x-4">
-            <a href="/costumer/<%= costumer.id %>/detail" class="text-green-600 hover:text-green-900" title="View Details">
-              <i class="fa fa-info-circle"></i>
-            </a>
-            <a href="/costumer/<%= costumer.id %>/edit" class="text-blue-600 hover:text-blue-900" title="Edit">
-              <i class="fa fa-edit"></i>
-            </a>
-            <form action="/costumer/<%= costumer.id %>/delete" method="POST" onsubmit="return confirmDelete(event)">
-              <button type="submit" class="text-red-600 hover:text-red-900" title="Delete">
-                <i class="fa fa-trash"></i>
-              </button>
-            </form>
-          </td>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jabatan</th>
+          <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sekolah</th>
+          <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
         </tr>
-      <% }) %>
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% if(costumers.length > 0) { %>
+          <% costumers.forEach(costumer => { %>
+            <tr class="hover:bg-gray-50 transition-colors duration-200">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium"><%= costumer.Nama %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= costumer.Jabatan %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600"><%= costumer.Sekolah %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center justify-center space-x-4">
+                  <a href="/costumer/<%= costumer.id %>/detail" class="text-green-600 hover:text-green-800 transition" title="View Details">
+                    <i class="fa fa-info-circle fa-fw text-lg"></i>
+                  </a>
+                  <a href="/costumer/<%= costumer.id %>/edit" class="text-blue-600 hover:text-blue-800 transition" title="Edit Customer">
+                    <i class="fa fa-edit fa-fw text-lg"></i>
+                  </a>
+                  <form action="/costumer/<%= costumer.id %>/delete" method="POST" onsubmit="confirmDelete(event, '<%= costumer.Nama %>')">
+                    <button type="submit" class="text-red-600 hover:text-red-800 transition" title="Delete Customer">
+                      <i class="fa fa-trash fa-fw text-lg"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } else { %>
+          <tr id="no-data-row">
+              <td colspan="4" class="text-center py-10 px-4">
+                  <div class="flex flex-col items-center">
+                      <i class="fa fa-users-slash fa-3x text-gray-400 mb-3"></i>
+                      <p class="text-gray-500 text-lg">Belum ada data customer.</p>
+                      <p class="text-gray-400 text-sm">Coba tambahkan customer baru untuk memulai.</p>
+                  </div>
+              </td>
+          </tr>
+        <% } %>
+         <tr id="no-results-row" class="hidden">
+            <td colspan="4" class="text-center py-10 px-4">
+                <div class="flex flex-col items-center">
+                    <i class="fa fa-search fa-3x text-gray-400 mb-3"></i>
+                    <p class="text-gray-500 text-lg">Customer tidak ditemukan.</p>
+                    <p class="text-gray-400 text-sm">Coba kata kunci pencarian yang lain.</p>
+                </div>
+            </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 <script>
-  function confirmDelete(event) {
-    event.preventDefault();
+  function confirmDelete(event, customerName) {
+    event.preventDefault(); // Mencegah form dari submit secara langsung
     Swal.fire({
-      title: 'Are you sure?',
-      text: "This will delete the customer record.",
+      title: 'Apakah Anda yakin?',
+      html: `Anda akan menghapus customer: <strong>${customerName}</strong>. <br/>Aksi ini tidak dapat dibatalkan.`,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#d33',
       cancelButtonColor: '#3085d6',
-      confirmButtonText: 'Yes, delete it!'
+      confirmButtonText: 'Ya, hapus!',
+      cancelButtonText: 'Batal'
     }).then((result) => {
       if (result.isConfirmed) {
+        // Jika dikonfirmasi, submit formnya
         event.target.submit();
       }
     });
-    return false;
+  }
+
+  function searchTable() {
+    const input = document.getElementById('searchInput');
+    const filter = input.value.toUpperCase();
+    const table = document.getElementById('customerTable');
+    const tr = table.getElementsByTagName('tr');
+    const noResultsRow = document.getElementById('no-results-row');
+    let found = false;
+
+    // Loop melalui semua baris tabel, dan sembunyikan yang tidak cocok
+    for (let i = 1; i < tr.length; i++) { // Mulai dari 1 untuk melewati header
+      let rowVisible = false;
+      const td = tr[i].getElementsByTagName('td');
+      if (td.length > 0 && !tr[i].id.includes('row')) { // Pastikan baris memiliki data
+        for (let j = 0; j < td.length - 1; j++) { // Loop kolom data, lewati kolom action
+          if (td[j]) {
+            if (td[j].textContent.toUpperCase().indexOf(filter) > -1) {
+              rowVisible = true;
+              found = true;
+              break; // Jika satu kolom cocok, tampilkan baris dan lanjut ke baris berikutnya
+            }
+          }
+        }
+        tr[i].style.display = rowVisible ? '' : 'none';
+      }
+    }
+    
+    // Tampilkan pesan "tidak ditemukan" jika tidak ada baris yang cocok
+    noResultsRow.style.display = found ? 'none' : '';
   }
 </script>
+
 <%- include('../partials/footer') %>

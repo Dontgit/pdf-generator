@@ -1,32 +1,89 @@
 <%- include('../partials/header') %>
-<div class="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow">
-  <h1 class="text-3xl font-extrabold text-gray-900 mb-6">Customer Detail</h1>
-  <div class="mb-4">
-    <strong>Nama:</strong> <%= costumer.Nama %>
+
+<div class="max-w-5xl mx-auto">
+  <!-- Header Halaman -->
+  <div class="mb-6">
+    <a href="/costumer" class="text-blue-600 hover:underline flex items-center gap-2 mb-2">
+      <i class="fa-solid fa-arrow-left"></i>
+      Kembali ke Daftar Customer
+    </a>
+    <h1 class="text-4xl font-extrabold text-gray-900">Detail Customer</h1>
   </div>
-  <div class="mb-4">
-    <strong>Jabatan:</strong> <%= costumer.Jabatan %>
-  </div>
-  <div class="mb-4">
-    <strong>NIP:</strong> <%= costumer.NIP %>
-  </div>
-  <div class="mb-4">
-    <strong>Sekolah:</strong> <%= costumer.Sekolah %>
-  </div>
-  <div class="mb-4">
-    <strong>Alamat:</strong> <%= costumer.Alamat %>
-  </div>
-  <div class="mb-4">
-    <strong>Kop Surat:</strong><br/>
-    <% if (costumer.kop_surat) { %>
-      <img src="<%= costumer.kop_surat %>" alt="Kop Surat" class="max-w-full h-auto rounded" />
-    <% } else { %>
-      <span>No Kop Surat uploaded</span>
-    <% } %>
-  </div>
-  <div class="mt-6">
-    <a href="/costumer" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Back to List</a>
-    <a href="/costumer/<%= costumer.id %>/edit" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition ml-4">Edit</a>
+
+  <!-- Kartu Detail Customer -->
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="p-6 md:p-8">
+      <!-- Info Utama dan Tombol Aksi -->
+      <div class="flex flex-col md:flex-row justify-between items-start gap-4 mb-8 pb-6 border-b border-gray-200">
+        <div>
+          <h2 class="text-3xl font-bold text-gray-800"><%= costumer.Nama %></h2>
+          <p class="text-lg text-gray-500"><%= costumer.Jabatan %></p>
+        </div>
+        <div class="flex-shrink-0 flex items-center gap-3">
+          <a href="/costumer/<%= costumer.id %>/edit" class="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-2 rounded-lg shadow-md hover:bg-blue-700 transition">
+            <i class="fa-solid fa-pencil mr-2"></i> Edit
+          </a>
+        </div>
+      </div>
+
+      <!-- Grid untuk Detail Informasi -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Kolom Informasi Detail (2/3 Lebar) -->
+        <div class="md:col-span-2 space-y-6">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Informasi Instansi</h3>
+            <ul class="space-y-4">
+              <li class="flex items-start gap-4">
+                <i class="fa-solid fa-school text-xl text-gray-400 mt-1"></i>
+                <div>
+                  <strong class="block text-sm text-gray-500">Sekolah</strong>
+                  <span class="text-base text-gray-800"><%= costumer.Sekolah %></span>
+                </div>
+              </li>
+              <li class="flex items-start gap-4">
+                <i class="fa-solid fa-map-marker-alt text-xl text-gray-400 mt-1"></i>
+                <div>
+                  <strong class="block text-sm text-gray-500">Alamat</strong>
+                  <span class="text-base text-gray-800"><%= costumer.Alamat %></span>
+                </div>
+              </li>
+            </ul>
+          </div>
+          <div>
+             <h3 class="text-lg font-semibold text-gray-700 border-b pb-2 mb-4">Informasi Personal</h3>
+             <ul class="space-y-4">
+               <li class="flex items-start gap-4">
+                <i class="fa-solid fa-id-card text-xl text-gray-400 mt-1"></i>
+                <div>
+                  <strong class="block text-sm text-gray-500">NIP</strong>
+                  <span class="text-base text-gray-800"><%= costumer.NIP || 'Tidak ada data' %></span>
+                </div>
+              </li>
+             </ul>
+          </div>
+        </div>
+
+        <!-- Kolom Kop Surat (1/3 Lebar) -->
+        <div class="md:col-span-1">
+          <h3 class="text-lg font-semibold text-gray-700 mb-4">Kop Surat</h3>
+          <div class="border border-gray-200 rounded-lg p-3 bg-gray-50">
+            <% if (costumer.kop_surat) { %>
+              <a href="<%= costumer.kop_surat %>" target="_blank" rel="noopener noreferrer" title="Lihat gambar penuh">
+                <img src="<%= costumer.kop_surat %>" alt="Kop Surat" class="w-full h-auto rounded-md object-cover shadow-sm transition-transform hover:scale-105" />
+              </a>
+            <% } else { %>
+              <div class="w-full text-center py-10 border-2 border-dashed border-gray-300 rounded-md">
+                <i class="fa-solid fa-image fa-3x text-gray-400 mb-2"></i>
+                <p class="text-sm text-gray-500">Kop Surat belum diunggah</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </div>
+
 <%- include('../partials/footer') %>
